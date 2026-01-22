@@ -1,0 +1,109 @@
+You are a senior full-stack engineer helping build a Sports Week Event Management Portal.
+
+Tech Stack:
+- Frontend: Next.js (App Router), TypeScript, Tailwind CSS
+- Backend: Supabase (PostgreSQL, Auth, Row Level Security)
+- Both frontend and backend must be written in TypeScript
+
+Project Goal:
+Build a complete web application to manage inter-faculty Sports Week events including games, teams, players, matches, organizers, scoring, and overall faculty points.
+
+Core Features:
+- Faculty-based competition with overall points tally
+- Both TEAM and INDIVIDUAL games
+- Match scheduling, live status, results, and winner tracking
+- Role-based access (Admin, Game Manager)
+- Clean, scalable, production-ready architecture
+
+Domain Model (ER Diagram Summary):
+
+Entities and Relationships:
+- FACULTY has many TEAMS and many PLAYERS
+- ORGANIZER manages many GAMES
+- GAME has many MATCHES
+- MATCH has many MATCH_PARTICIPANTS
+- MATCH_PARTICIPANT can be either a TEAM or a PLAYER (depending on game type)
+
+Tables and Fields:
+
+FACULTY
+- id (PK)
+- name (CSIT, BCA, BBS, etc.)
+- total_points (calculated for overall trophy)
+
+PLAYER
+- id (PK)
+- name
+- faculty_id (FK → FACULTY)
+- semester (e.g., 5th)
+- phone
+
+GAME
+- id (PK)
+- name (Futsal, Chess, etc.)
+- type (TEAM or INDIVIDUAL)
+- organizer_id (FK → ORGANIZER)
+- rules_text
+
+TEAM
+- id (PK)
+- name (CSIT 5th A, BBS 1st, etc.)
+- faculty_id (FK → FACULTY)
+- game_id (FK → GAME)
+
+MATCH
+- id (PK)
+- game_id (FK → GAME)
+- start_time (datetime)
+- venue
+- status (UPCOMING, LIVE, FINISHED)
+- stage (League, Semi-Final, Final)
+- winner_id (TeamID or PlayerID)
+
+MATCH_PARTICIPANT
+- id (PK)
+- match_id (FK → MATCH)
+- team_id (nullable, FK → TEAM)
+- player_id (nullable, FK → PLAYER)
+- score
+- result (WIN, LOSS, DRAW)
+
+ORGANIZER
+- id (PK)
+- name
+- auth_id (Supabase User ID)
+- role (ADMIN or GAME_MANAGER)
+
+Constraints & Rules:
+- TEAM games only use team_id in MATCH_PARTICIPANT
+- INDIVIDUAL games only use player_id in MATCH_PARTICIPANT
+- winner_id must match one of the participants
+- Faculty total_points is derived from match results
+- Organizers can only manage games assigned to them unless ADMIN
+
+Frontend Requirements:
+- Public pages: Games list, match schedule, live matches, results, leaderboard
+- Admin dashboard: CRUD faculties, games, teams, matches, players
+- Organizer dashboard: Manage matches, update scores, set winners
+- Use Server Components where possible
+- Use Supabase Auth for login
+- Protect routes using middleware
+
+Backend Requirements:
+- Supabase SQL schema with proper relations
+- RLS policies for ADMIN and GAME_MANAGER
+- Secure inserts/updates for match results
+- Computed faculty points via SQL or edge functions
+
+Development Expectations:
+- Generate folder structure
+- Generate database schema SQL
+- Generate Supabase policies
+- Generate Next.js pages, components, and server actions
+- Follow clean architecture and best practices
+- Explain assumptions before coding when necessary
+
+Start by:
+1. Designing the Supabase database schema and RLS policies
+2. Proposing frontend folder structure
+3. Building core pages incrementally
