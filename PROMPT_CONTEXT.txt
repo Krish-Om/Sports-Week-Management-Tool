@@ -126,10 +126,3 @@ Build the root page / showing all fixtures.
 Implement Supabase Realtime so the page refreshes scores automatically without a reload.
 
 Add a "Live" pulse animation for matches with status: LIVE.
-
-Day 5: Polish & Deployment
-Add search and category filters.
-
-Mobile responsiveness check (Managers will be on the field).
-
-Deploy to Vercel.
