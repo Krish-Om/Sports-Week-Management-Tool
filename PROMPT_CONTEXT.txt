@@ -1,0 +1,135 @@
+Here is the comprehensive Project Blueprint and Execution Guide formatted in Markdown. You can save this as blueprint.md in your project folder and reference it in VS Code Copilot, Cursor, or Windsurf.
+
+🏟️ Sports Week Digitization Blueprint (4-5 Day Sprint)
+1. Project Context
+Goal: Moving from manual sports coordination to a centralized real-time dashboard.
+
+Target: College sports week (Football, Basketball, Esports, etc.).
+
+Vibe Coding Strategy: High-speed development using AI, focusing on state management (Upcoming -> Live -> Finished) and real-time score propagation.
+
+2. Tech Stack
+Framework: Next.js 15 (App Router)
+
+ORM: Prisma (Postgres)
+
+Backend/Auth: Supabase
+
+UI: Tailwind CSS + Shadcn/UI + Lucide Icons
+
+Real-time: Supabase Realtime (for the live dashboard vibe)
+
+3. System Architecture (Mermaid)
+Code snippet
+graph TD
+    subgraph "Admin & Manager App"
+        Auth[Supabase Auth] --> Dashboard[Control Panel]
+        Dashboard -- "Prisma Write" --> DB[(PostgreSQL)]
+    end
+
+    subgraph "Public Dashboard"
+        Public[Live Fixtures View] -- "Realtime Subscribe" --> RT((Supabase Realtime))
+    end
+
+    DB -- "DB Trigger" --> RT
+    RT -- "Instant Pulse Update" --> Public
+4. Prisma Schema (The Source of Truth)
+Code snippet
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+}
+
+enum MatchStatus {
+  UPCOMING
+  LIVE
+  FINISHED
+}
+
+model Profile {
+  id              String   @id @default(uuid())
+  fullName        String?
+  role            Role     @default(MANAGER)
+  assignedGameId  String?
+  assignedGame    Game?    @relation(fields: [assignedGameId], references: [id])
+}
+
+model Game {
+  id       String    @id @default(uuid())
+  name     String    @unique // e.g., Football, Valorant
+  icon     String?   // Lucide icon name
+  profiles Profile[]
+  matches  Match[]
+}
+
+model Team {
+  id           String  @id @default(uuid())
+  name         String
+  department   String?
+  matchesAsA   Match[] @relation("TeamA")
+  matchesAsB   Match[] @relation("TeamB")
+}
+
+model Match {
+  id          String      @id @default(uuid())
+  gameId      String
+  game        Game        @relation(fields: [gameId], references: [id])
+  teamAId     String
+  teamA       Team        @relation("TeamA", fields: [teamAId], references: [id])
+  teamBId     String
+  teamB       Team        @relation("TeamB", fields: [teamBId], references: [id])
+  venue       String
+  startTime   DateTime
+  status      MatchStatus @default(UPCOMING)
+  scoreA      Int         @default(0)
+  scoreB      Int         @default(0)
+  winnerId    String?
+}
+5. 5-Day Execution Plan
+Day 1: Scaffolding & Database
+Initialize Next.js with npx create-next-app@latest.
+
+Install Prisma: npm install prisma @prisma/client.
+
+Connect Supabase via .env.
+
+Push schema: npx prisma db push.
+
+Setup Shadcn UI components (Card, Button, Badge, Table).
+
+Day 2: Auth & Role Logic
+Setup Supabase Auth.
+
+Create a middleware.ts to protect /manager and /admin routes.
+
+Build the "Admin Only" view to create Teams and Games and assign Managers.
+
+Day 3: Manager Dashboard (The Field App)
+Build the Manager view: Filter matches by assignedGameId.
+
+Create the "Create Match" form (Step 2 of the plan).
+
+Implement the "Live Score Toggle" so managers can update scores from their phones.
+
+Day 4: Public Dashboard (The "Vibe" Front)
+Build the root page / showing all fixtures.
+
+Implement Supabase Realtime so the page refreshes scores automatically without a reload.
+
+Add a "Live" pulse animation for matches with status: LIVE.
+
+Day 5: Polish & Deployment
+Add search and category filters.
+
+Mobile responsiveness check (Managers will be on the field).
+
+Deploy to Vercel.
