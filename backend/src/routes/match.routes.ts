@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { MatchService } from '../services/match.service';
 import { GameService } from '../services/game.service';
 import { TeamService } from '../services/team.service';
@@ -11,7 +11,7 @@ import type { Match, NewMatch } from '../db/schema';
 const router = Router();
 
 // Get all matches (public)
-router.get('/', asyncHandler(async (req, res) => {
+router.get('/', asyncHandler(async (req: Request, res: Response) => {
   const matches = await MatchService.getAll();
   
   const response: ApiResponse<Match[]> = {
@@ -23,7 +23,7 @@ router.get('/', asyncHandler(async (req, res) => {
 }));
 
 // Get match by ID with participants (public)
-router.get('/:id', asyncHandler(async (req, res) => {
+router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
   const match = await MatchService.getById(req.params.id);
   
   if (!match) {
@@ -33,7 +33,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
     });
   }
 
-  const participants = await MatchService.getParticipants(req.params.id);
+  const participants = await MatchService.getParticipantsWithDetails(req.params.id);
   
   const response: ApiResponse<any> = {
     success: true,
@@ -44,7 +44,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 }));
 
 // Create match (admin only)
-router.post('/', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
+router.post('/', authenticateToken, requireAdmin, asyncHandler(async (req: Request, res: Response) => {
   const { gameId, startTime, venue, status, participants } = req.body;
 
   // Validate required fields
@@ -98,7 +98,7 @@ router.post('/', authenticateToken, requireAdmin, asyncHandler(async (req, res) 
     }
   }
 
-  const matchParticipants = await MatchService.getParticipants(match.id);
+  const matchParticipants = await MatchService.getParticipantsWithDetails(match.id);
   
   const response: ApiResponse<any> = {
     success: true,
@@ -110,8 +110,10 @@ router.post('/', authenticateToken, requireAdmin, asyncHandler(async (req, res) 
 }));
 
 // Update match (admin only)
-router.put('/:id', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
-  const { gameId, startTime, venue, status, participants } = req.body;
+router.put('/:id', authenticateToken, asyncHandler(async (req: Request, res: Response) => {
+  const { gameId, startTime, venue, status, participants, winnerId } = req.body;
+  const userId = (req as any).user?.id;
+  const userRole = (req as any).user?.role;
 
   // Check if match exists
   const existingMatch = await MatchService.getById(req.params.id);
@@ -122,7 +124,28 @@ router.put('/:id', authenticateToken, requireAdmin, asyncHandler(async (req, res
     });
   }
 
-  // Verify game if being updated
+  // Authorization: Only admins can change game/venue/startTime. Managers can only update status and winnerId
+  if (userRole !== 'ADMIN') {
+    // Managers can only update status and winnerId for their assigned games
+    const game = await GameService.getById(existingMatch.gameId);
+    
+    if (!game || game.managerId !== userId) {
+      return res.status(403).json({
+        success: false,
+        error: 'You can only update matches for your assigned games',
+      });
+    }
+
+    // Managers can only update status and winnerId
+    if (gameId !== undefined || startTime !== undefined || venue !== undefined) {
+      return res.status(403).json({
+        success: false,
+        error: 'Managers can only update match status and winner',
+      });
+    }
+  }
+
+  // Verify game if being updated (admin only)
   if (gameId) {
     const game = await GameService.getById(gameId);
     if (!game) {
@@ -146,6 +169,7 @@ router.put('/:id', authenticateToken, requireAdmin, asyncHandler(async (req, res
   if (startTime !== undefined) updateData.startTime = new Date(startTime);
   if (venue !== undefined) updateData.venue = venue;
   if (status !== undefined) updateData.status = status as any;
+  if (winnerId !== undefined) updateData.winnerId = winnerId;
 
   const match = await MatchService.update(req.params.id, updateData);
 
@@ -179,7 +203,7 @@ router.put('/:id', authenticateToken, requireAdmin, asyncHandler(async (req, res
     }
   }
 
-  const matchParticipants = await MatchService.getParticipants(match.id);
+  const matchParticipants = await MatchService.getParticipantsWithDetails(match.id);
   
   const response: ApiResponse<any> = {
     success: true,
@@ -191,7 +215,7 @@ router.put('/:id', authenticateToken, requireAdmin, asyncHandler(async (req, res
 }));
 
 // Delete match (admin only)
-router.delete('/:id', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
+router.delete('/:id', authenticateToken, requireAdmin, asyncHandler(async (req: Request, res: Response) => {
   const match = await MatchService.getById(req.params.id);
   
   if (!match) {

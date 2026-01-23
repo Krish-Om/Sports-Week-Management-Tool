@@ -23,6 +23,9 @@ export class MatchService {
       .values(data)
       .returning();
     
+    if (!match) {
+      throw new Error('Failed to create match');
+    }
     return match;
   }
 
@@ -33,6 +36,9 @@ export class MatchService {
       .where(eq(schema.matches.id, id))
       .returning();
     
+    if (!match) {
+      throw new Error('Failed to update match');
+    }
     return match;
   }
 
@@ -63,6 +69,9 @@ export class MatchService {
       .values(data)
       .returning();
     
+    if (!participant) {
+      throw new Error('Failed to add participant');
+    }
     return participant;
   }
 
@@ -73,9 +82,77 @@ export class MatchService {
       .where(eq(schema.matchParticipants.matchId, matchId));
   }
 
+  static async getParticipantsWithDetails(matchId: string): Promise<any[]> {
+    const participants = await db
+      .select()
+      .from(schema.matchParticipants)
+      .where(eq(schema.matchParticipants.matchId, matchId));
+
+    // Fetch team and player details for each participant
+    const enrichedParticipants = await Promise.all(
+      participants.map(async (participant) => {
+        let team = null;
+        let player = null;
+
+        if (participant.teamId) {
+          const [teamData] = await db
+            .select()
+            .from(schema.teams)
+            .where(eq(schema.teams.id, participant.teamId))
+            .limit(1);
+          team = teamData || null;
+        }
+
+        if (participant.playerId) {
+          const [playerData] = await db
+            .select()
+            .from(schema.players)
+            .where(eq(schema.players.id, participant.playerId))
+            .limit(1);
+          player = playerData || null;
+        }
+
+        return {
+          ...participant,
+          team,
+          player,
+        };
+      })
+    );
+
+    return enrichedParticipants;
+  }
+
   static async deleteParticipants(matchId: string): Promise<void> {
     await db
       .delete(schema.matchParticipants)
       .where(eq(schema.matchParticipants.matchId, matchId));
+  }
+
+  static async updateParticipantScore(
+    participantId: string,
+    score: number,
+    pointsEarned: number
+  ): Promise<MatchParticipant> {
+    const [participant] = await db
+      .update(schema.matchParticipants)
+      .set({ score, pointsEarned, updatedAt: new Date() })
+      .where(eq(schema.matchParticipants.id, participantId))
+      .returning();
+    
+    if (!participant) {
+      throw new Error('Failed to update participant score');
+    }
+    return participant;
+  }
+
+  static async getParticipantById(participantId: string): Promise<MatchParticipant | undefined> {
+    const [participant] = await db
+      .select()
+      .from(schema.matchParticipants)
+      .where(eq(schema.matchParticipants.id, participantId))
+      .limit(1);
+    
+    return participant;
   }
 }

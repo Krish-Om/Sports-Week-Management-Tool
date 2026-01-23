@@ -13,6 +13,9 @@ import GamesPage from './pages/admin/GamesPage'
 import TeamsPage from './pages/admin/TeamsPage'
 import PlayersPage from './pages/admin/PlayersPage'
 import MatchesPage from './pages/admin/MatchesPage'
+import ManagerLayout from './layouts/ManagerLayout'
+import ManagerDashboard from './pages/manager/ManagerDashboard'
+import ManagerLeaderboard from './pages/manager/ManagerLeaderboard'
 
 function App() {
   return (
@@ -48,7 +51,29 @@ function App() {
               path="/manager"
               element={
                 <ProtectedRoute requiredRole="MANAGER">
-                  <div>Manager Dashboard - Coming Soon</div>
+                  <ManagerLayout>
+                    <ManagerDashboard />
+                  </ManagerLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manager/dashboard"
+              element={
+                <ProtectedRoute requiredRole="MANAGER">
+                  <ManagerLayout>
+                    <ManagerDashboard />
+                  </ManagerLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manager/leaderboard"
+              element={
+                <ProtectedRoute requiredRole="MANAGER">
+                  <ManagerLayout>
+                    <ManagerLeaderboard />
+                  </ManagerLayout>
                 </ProtectedRoute>
               }
             />

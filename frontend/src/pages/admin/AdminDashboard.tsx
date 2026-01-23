@@ -1,11 +1,47 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useSocket } from '../../contexts/SocketContext'
 import { Trophy, Users, Calendar, Wifi, WifiOff } from 'lucide-react'
+import { api } from '../../config/api'
 
 export const AdminDashboard: React.FC = () => {
   const { user } = useAuth()
   const { isConnected } = useSocket()
+  const [stats, setStats] = useState({
+    faculties: 0,
+    teams: 0,
+    upcomingMatches: 0,
+  })
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [facultiesRes, teamsRes, matchesRes] = await Promise.all([
+          api.get('/faculties'),
+          api.get('/teams'),
+          api.get('/matches'),
+        ])
+
+        const faculties = facultiesRes.data.data || []
+        const teams = teamsRes.data.data || []
+        const matches = matchesRes.data.data || []
+
+        const upcomingMatches = matches.filter(
+          (match: any) => match.status === 'UPCOMING'
+        ).length
+
+        setStats({
+          faculties: faculties.length,
+          teams: teams.length,
+          upcomingMatches,
+        })
+      } catch (err) {
+        console.error('Failed to fetch stats:', err)
+      }
+    }
+
+    fetchStats()
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -35,7 +71,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm font-medium">Total Faculties</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">4</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.faculties}</p>
             </div>
             <div className="bg-primary/10 p-3 rounded-full">
               <Trophy className="w-8 h-8 text-primary" />
@@ -47,7 +83,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm font-medium">Total Teams</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.teams}</p>
             </div>
             <div className="bg-secondary/10 p-3 rounded-full">
               <Users className="w-8 h-8 text-secondary" />
@@ -59,7 +95,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm font-medium">Upcoming Matches</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.upcomingMatches}</p>
             </div>
             <div className="bg-green-100 p-3 rounded-full">
               <Calendar className="w-8 h-8 text-green-600" />

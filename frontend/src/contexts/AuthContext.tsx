@@ -10,7 +10,7 @@ interface User {
 interface AuthContextType {
   user: User | null
   token: string | null
-  login: (username: string, password: string) => Promise<void>
+  login: (username: string, password: string) => Promise<{ user: User; token: string }>
   logout: () => void
   isLoading: boolean
   isAuthenticated: boolean
@@ -52,6 +52,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       localStorage.setItem('token', newToken)
       localStorage.setItem('user', JSON.stringify(newUser))
+
+      return { user: newUser, token: newToken }
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Login failed')
     }
