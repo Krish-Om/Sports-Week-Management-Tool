@@ -8,6 +8,11 @@ import { PublicDashboard } from './pages/public/PublicDashboard'
 import { AdminLayout } from './components/layout/AdminLayout'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
 import { UsersPage } from './pages/admin/UsersPage'
+import FacultiesPage from './pages/admin/FacultiesPage'
+import GamesPage from './pages/admin/GamesPage'
+import TeamsPage from './pages/admin/TeamsPage'
+import PlayersPage from './pages/admin/PlayersPage'
+import MatchesPage from './pages/admin/MatchesPage'
 
 function App() {
   return (
@@ -30,11 +35,11 @@ function App() {
               }
             >
               <Route index element={<AdminDashboard />} />
-              <Route path="faculties" element={<div className="text-2xl">Faculties Page - Coming Soon</div>} />
-              <Route path="games" element={<div className="text-2xl">Games Page - Coming Soon</div>} />
-              <Route path="teams" element={<div className="text-2xl">Teams Page - Coming Soon</div>} />
-              <Route path="players" element={<div className="text-2xl">Players Page - Coming Soon</div>} />
-              <Route path="matches" element={<div className="text-2xl">Matches Page - Coming Soon</div>} />
+              <Route path="faculties" element={<FacultiesPage />} />
+              <Route path="games" element={<GamesPage />} />
+              <Route path="teams" element={<TeamsPage />} />
+              <Route path="players" element={<PlayersPage />} />
+              <Route path="matches" element={<MatchesPage />} />
               <Route path="users" element={<UsersPage />} />
             </Route>
 

@@ -29,8 +29,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const storedUser = localStorage.getItem('user')
 
     if (storedToken && storedUser) {
-      setToken(storedToken)
-      setUser(JSON.parse(storedUser))
+      try {
+        setToken(storedToken)
+        setUser(JSON.parse(storedUser))
+      } catch (error) {
+        // Invalid stored data, clear it
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+      }
     }
 
     setIsLoading(false)
@@ -39,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (username: string, password: string) => {
     try {
       const response = await api.post('/auth/login', { username, password })
-      const { token: newToken, user: newUser } = response.data
+      const { token: newToken, user: newUser } = response.data.data
 
       setToken(newToken)
       setUser(newUser)
