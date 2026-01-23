@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { SocketProvider } from './contexts/SocketContext'
+import { ToastProvider } from './contexts/ToastContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ProtectedRoute } from './components/common/ProtectedRoute'
 import { ConnectionBanner } from './components/common/ConnectionBanner'
@@ -26,9 +27,10 @@ function App() {
     <ErrorBoundary>
       <AuthProvider>
         <SocketProvider>
-          <Router>
-            <ConnectionBanner />
-            <Routes>
+          <ToastProvider>
+            <Router>
+              <ConnectionBanner />
+              <Routes>
               {/* Public Routes */}
               <Route path="/" element={<PublicDashboard />} />
               <Route path="/login" element={<LoginPage />} />
@@ -88,10 +90,11 @@ function App() {
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Router>
-      </SocketProvider>
-    </AuthProvider>
+              </Routes>
+            </Router>
+          </ToastProvider>
+        </SocketProvider>
+      </AuthProvider>
     </ErrorBoundary>
   )
 }

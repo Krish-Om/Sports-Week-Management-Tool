@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useSocket } from '../../contexts/SocketContext'
+import { useToast } from '../../contexts/ToastContext'
 import { Trophy, Users, Calendar, Wifi, WifiOff, TrendingUp } from 'lucide-react'
 import { api } from '../../config/api'
 import { StatsSkeleton, LeaderboardSkeleton } from '../../components/Skeleton'
@@ -14,6 +15,7 @@ interface Faculty {
 export const AdminDashboard: React.FC = () => {
   const { user } = useAuth()
   const { isConnected, socket } = useSocket()
+  const { error: errorToast } = useToast()
   const [stats, setStats] = useState({
     faculties: 0,
     teams: 0,
@@ -48,8 +50,7 @@ export const AdminDashboard: React.FC = () => {
           upcomingMatches,
         })
       } catch (err) {
-        console.error('Failed to fetch stats:', err)
-      } finally {
+        console.error('Failed to fetch stats:', err)        errorToast('Failed to load dashboard statistics')      } finally {
         setLoading(false)
       }
     }
@@ -81,6 +82,7 @@ export const AdminDashboard: React.FC = () => {
       setLeaderboard(response.data.data || [])
     } catch (err) {
       console.error('Failed to fetch leaderboard:', err)
+      errorToast('Failed to load leaderboard')
     } finally {
       setLeaderboardLoading(false)
     }

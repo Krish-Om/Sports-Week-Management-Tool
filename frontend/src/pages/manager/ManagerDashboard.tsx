@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSocket } from '../../contexts/SocketContext';
+import { useToast } from '../../contexts/ToastContext';
 import { Loader, AlertCircle, Trophy } from 'lucide-react';
 import api from '../../config/api';
 import { MatchCardSkeleton, LeaderboardSkeleton } from '../../components/Skeleton';
@@ -43,6 +44,7 @@ interface Faculty {
 export default function ManagerDashboard() {
   const { user } = useAuth();
   const { socket } = useSocket();
+  const { error: errorToast } = useToast();
   const [assignedGames, setAssignedGames] = useState<Game[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [leaderboard, setLeaderboard] = useState<Faculty[]>([]);
@@ -111,7 +113,9 @@ export default function ManagerDashboard() {
       }
       setError('');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to fetch assigned games');
+      const errorMsg = err.response?.data?.error || 'Failed to fetch assigned games';
+      setError(errorMsg);
+      errorToast(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -154,6 +158,7 @@ export default function ManagerDashboard() {
       setMatches(sortedMatches);
     } catch (err: any) {
       console.error('Failed to fetch matches:', err);
+      errorToast('Failed to load matches');
     } finally {
       setMatchesLoading(false);
     }
