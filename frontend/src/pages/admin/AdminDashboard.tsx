@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useSocket } from '../../contexts/SocketContext'
 import { useToast } from '../../contexts/ToastContext'
@@ -14,6 +15,7 @@ interface Faculty {
 }
 
 export const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { isConnected, socket } = useSocket()
   const { error: errorToast } = useToast()
@@ -167,19 +169,31 @@ export const AdminDashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
           <div className="grid md:grid-cols-2 gap-4">
-            <button className="p-4 border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition text-left">
+            <button 
+              onClick={() => navigate('/admin/games')}
+              className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition text-left font-medium hover:shadow-md"
+            >
               <h3 className="font-semibold text-gray-900">Add New Game</h3>
               <p className="text-sm text-gray-600 mt-1">Create a new game for the sports week</p>
             </button>
-            <button className="p-4 border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition text-left">
+            <button 
+              onClick={() => navigate('/admin/matches')}
+              className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition text-left font-medium hover:shadow-md"
+            >
               <h3 className="font-semibold text-gray-900">Schedule Match</h3>
               <p className="text-sm text-gray-600 mt-1">Schedule a new match between teams</p>
             </button>
-            <button className="p-4 border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition text-left">
+            <button 
+              onClick={() => navigate('/admin/players')}
+              className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition text-left font-medium hover:shadow-md"
+            >
               <h3 className="font-semibold text-gray-900">Add Players</h3>
               <p className="text-sm text-gray-600 mt-1">Register players for their faculties</p>
             </button>
-            <button className="p-4 border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition text-left">
+            <button 
+              onClick={() => navigate('/public/leaderboard')}
+              className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition text-left font-medium hover:shadow-md"
+            >
               <h3 className="font-semibold text-gray-900">View Leaderboard</h3>
               <p className="text-sm text-gray-600 mt-1">Check current faculty standings</p>
             </button>
