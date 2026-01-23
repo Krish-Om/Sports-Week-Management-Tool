@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { SocketProvider } from './contexts/SocketContext'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { ProtectedRoute } from './components/common/ProtectedRoute'
 import { ConnectionBanner } from './components/common/ConnectionBanner'
 import { LoginPage } from './pages/auth/LoginPage'
@@ -22,17 +23,18 @@ import ManagerLeaderboard from './pages/manager/ManagerLeaderboard'
 
 function App() {
   return (
-    <AuthProvider>
-      <SocketProvider>
-        <Router>
-          <ConnectionBanner />
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<PublicDashboard />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/fixtures" element={<PublicFixtures />} />
-            <Route path="/live" element={<PublicLiveMatches />} />
-            <Route path="/leaderboard" element={<PublicLeaderboard />} />
+    <ErrorBoundary>
+      <AuthProvider>
+        <SocketProvider>
+          <Router>
+            <ConnectionBanner />
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<PublicDashboard />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/fixtures" element={<PublicFixtures />} />
+              <Route path="/live" element={<PublicLiveMatches />} />
+              <Route path="/leaderboard" element={<PublicLeaderboard />} />
 
             {/* Admin Routes */}
             <Route
@@ -90,6 +92,7 @@ function App() {
         </Router>
       </SocketProvider>
     </AuthProvider>
+    </ErrorBoundary>
   )
 }
 
