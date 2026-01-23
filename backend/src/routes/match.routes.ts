@@ -3,12 +3,14 @@ import { MatchService } from '../services/match.service';
 import { GameService } from '../services/game.service';
 import { TeamService } from '../services/team.service';
 import { PlayerService } from '../services/player.service';
+import { PointsService } from '../services/points.service';
 import { asyncHandler } from '../middleware/error';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { db, schema } from '../config/database';
 import { eq } from 'drizzle-orm';
 import type { ApiResponse } from '../types/api';
 import type { Match, NewMatch } from '../db/schema';
+import { io } from '../index';
 
 const router = Router();
 
@@ -207,6 +209,33 @@ router.put('/:id', authenticateToken, asyncHandler(async (req: Request, res: Res
         score: participant.score || 0,
         pointsEarned: participant.pointsEarned || 0,
       });
+    }
+  }
+
+  // If match is now FINISHED, calculate and apply points
+  if (status === 'FINISHED' && existingMatch.status !== 'FINISHED') {
+    try {
+      const calculation = await PointsService.calculateMatchPoints(req.params.id);
+      if (calculation) {
+        await PointsService.applyPoints(calculation);
+
+        // Emit Socket.io event for leaderboard update
+        io.emit('leaderboardUpdate', {
+          matchId: req.params.id,
+          winnerFacultyId: calculation.winnerFacultyId,
+          winnerFacultyName: calculation.winnerFacultyName,
+          pointsAwarded: calculation.pointsAwarded,
+          gameWeight: calculation.gameWeight,
+          timestamp: new Date().toISOString(),
+        });
+
+        console.log(
+          `✅ Points applied for match ${req.params.id}: ${calculation.winnerFacultyName} +${calculation.pointsAwarded}`
+        );
+      }
+    } catch (error: any) {
+      console.error('Failed to apply points for finished match:', error);
+      // Don't fail the request, just log the error
     }
   }
 
