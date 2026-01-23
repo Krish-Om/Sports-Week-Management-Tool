@@ -2,6 +2,10 @@ import { Router } from 'express';
 import authRoutes from './auth';
 import facultyRoutes from './faculty.routes';
 import userRoutes from './user.routes';
+import gameRoutes from './game.routes';
+import teamRoutes from './team.routes';
+import playerRoutes from './player.routes';
+import matchRoutes from './match.routes';
 
 const router = Router();
 
@@ -23,5 +27,17 @@ router.use('/faculties', facultyRoutes);
 
 // User routes
 router.use('/users', userRoutes);
+
+// Game routes
+router.use('/games', gameRoutes);
+
+// Team routes
+router.use('/teams', teamRoutes);
+
+// Player routes
+router.use('/players', playerRoutes);
+
+// Match routes
+router.use('/matches', matchRoutes);
 
 export default router;
