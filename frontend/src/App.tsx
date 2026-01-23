@@ -1,34 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from './contexts/AuthContext'
+import { SocketProvider } from './contexts/SocketContext'
+import { ProtectedRoute } from './components/common/ProtectedRoute'
+import { ConnectionBanner } from './components/common/ConnectionBanner'
+import { LoginPage } from './pages/auth/LoginPage'
+import { PublicDashboard } from './pages/public/PublicDashboard'
+import { AdminLayout } from './components/layout/AdminLayout'
+import { AdminDashboard } from './pages/admin/AdminDashboard'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <AuthProvider>
+      <SocketProvider>
+        <Router>
+          <ConnectionBanner />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<PublicDashboard />} />
+            <Route path="/login" element={<LoginPage />} />
+
+            {/* Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requiredRole="ADMIN">
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AdminDashboard />} />
+              <Route path="faculties" element={<div className="text-2xl">Faculties Page - Coming Soon</div>} />
+              <Route path="games" element={<div className="text-2xl">Games Page - Coming Soon</div>} />
+              <Route path="teams" element={<div className="text-2xl">Teams Page - Coming Soon</div>} />
+              <Route path="players" element={<div className="text-2xl">Players Page - Coming Soon</div>} />
+              <Route path="matches" element={<div className="text-2xl">Matches Page - Coming Soon</div>} />
+              <Route path="users" element={<div className="text-2xl">Users Page - Coming Soon</div>} />
+            </Route>
+
+            {/* Manager Routes */}
+            <Route
+              path="/manager"
+              element={
+                <ProtectedRoute requiredRole="MANAGER">
+                  <div>Manager Dashboard - Coming Soon</div>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </SocketProvider>
+    </AuthProvider>
   )
 }
 
