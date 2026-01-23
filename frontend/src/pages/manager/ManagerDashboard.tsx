@@ -56,17 +56,22 @@ export default function ManagerDashboard() {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('scoreUpdated', () => {
+    socket.on('scoreUpdate', () => {
       fetchMatches(selectedGameId);
     });
 
-    socket.on('matchStatusChanged', () => {
+    socket.on('matchStatusChange', () => {
+      fetchMatches(selectedGameId);
+    });
+
+    socket.on('matchWinnerSet', () => {
       fetchMatches(selectedGameId);
     });
 
     return () => {
-      socket.off('scoreUpdated');
-      socket.off('matchStatusChanged');
+      socket.off('scoreUpdate');
+      socket.off('matchStatusChange');
+      socket.off('matchWinnerSet');
     };
   }, [socket, selectedGameId]);
 

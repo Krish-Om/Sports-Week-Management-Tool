@@ -5,6 +5,9 @@ import { ProtectedRoute } from './components/common/ProtectedRoute'
 import { ConnectionBanner } from './components/common/ConnectionBanner'
 import { LoginPage } from './pages/auth/LoginPage'
 import { PublicDashboard } from './pages/public/PublicDashboard'
+import { PublicFixtures } from './pages/public/PublicFixtures'
+import { PublicLiveMatches } from './pages/public/PublicLiveMatches'
+import { PublicLeaderboard } from './pages/public/PublicLeaderboard'
 import { AdminLayout } from './components/layout/AdminLayout'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
 import { UsersPage } from './pages/admin/UsersPage'
@@ -27,6 +30,9 @@ function App() {
             {/* Public Routes */}
             <Route path="/" element={<PublicDashboard />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/fixtures" element={<PublicFixtures />} />
+            <Route path="/live" element={<PublicLiveMatches />} />
+            <Route path="/leaderboard" element={<PublicLeaderboard />} />
 
             {/* Admin Routes */}
             <Route
