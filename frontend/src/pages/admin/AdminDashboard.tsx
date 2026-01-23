@@ -51,7 +51,9 @@ export const AdminDashboard: React.FC = () => {
           upcomingMatches,
         })
       } catch (err) {
-        console.error('Failed to fetch stats:', err)        errorToast('Failed to load dashboard statistics')      } finally {
+        console.error('Failed to fetch stats:', err)
+        errorToast('Failed to load dashboard statistics')
+      } finally {
         setLoading(false)
       }
     }
