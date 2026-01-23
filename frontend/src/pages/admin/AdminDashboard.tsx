@@ -227,7 +227,6 @@ export const AdminDashboard: React.FC = () => {
           </div>
         )}
       </div>
-      </PageTransition>
-    </div>
+    </PageTransition>
   )
 }
