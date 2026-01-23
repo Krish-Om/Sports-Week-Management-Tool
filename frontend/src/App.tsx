@@ -7,6 +7,7 @@ import { LoginPage } from './pages/auth/LoginPage'
 import { PublicDashboard } from './pages/public/PublicDashboard'
 import { AdminLayout } from './components/layout/AdminLayout'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
+import { UsersPage } from './pages/admin/UsersPage'
 
 function App() {
   return (
@@ -34,7 +35,7 @@ function App() {
               <Route path="teams" element={<div className="text-2xl">Teams Page - Coming Soon</div>} />
               <Route path="players" element={<div className="text-2xl">Players Page - Coming Soon</div>} />
               <Route path="matches" element={<div className="text-2xl">Matches Page - Coming Soon</div>} />
-              <Route path="users" element={<div className="text-2xl">Users Page - Coming Soon</div>} />
+              <Route path="users" element={<UsersPage />} />
             </Route>
 
             {/* Manager Routes */}
