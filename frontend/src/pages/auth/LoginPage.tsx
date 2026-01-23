@@ -102,11 +102,6 @@ export const LoginPage: React.FC = () => {
             )}
           </button>
         </form>
-
-        <div className="mt-6 text-center text-sm text-gray-600">
-          <p>Demo Credentials:</p>
-          <p className="font-mono text-xs mt-2">admin / admin123</p>
-        </div>
       </div>
     </div>
   )
