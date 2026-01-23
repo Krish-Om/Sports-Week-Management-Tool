@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { api } from '../../../config/api'
+import { api } from '../../config/api'
 import { UserPlus, Edit2, Trash2, Shield, User as UserIcon } from 'lucide-react'
 
 interface User {
