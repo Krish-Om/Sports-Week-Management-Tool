@@ -120,7 +120,7 @@ export const PublicLiveMatches: React.FC = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-3 py-3">
         <PageTransition>
           {matches.length === 0 ? (
             <motion.div 
@@ -134,81 +134,106 @@ export const PublicLiveMatches: React.FC = () => {
               <p className="text-gray-500 text-sm mt-2">Check back later for live action!</p>
             </motion.div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               {matches.map((match, idx) => (
                 <CardTransition key={match.id} index={idx}>
-                  <motion.div 
-                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-                    whileHover={{ y: -2 }}
-                    transition={{ duration: 0.2 }}
+                  <motion.div
+                    className="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg hover:border-blue-400 transition-all overflow-hidden"
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    {/* Compact Header */}
-                    <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white px-4 py-3">
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="relative flex h-2 w-2 flex-shrink-0">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                          </div>
-                          <h2 className="text-lg font-bold text-white truncate drop-shadow-lg">
-                            {match.game?.name || 'Unknown Game'}
-                          </h2>
+                    {/* Header with Game Name and LIVE */}
+                    <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white px-3 py-2 flex items-center justify-between">
+                      <h3 className="text-sm font-bold truncate flex-1">
+                        {match.game?.name || 'Unknown'}
+                      </h3>
+                      <div className="flex items-center gap-1 ml-2 flex-shrink-0">
+                        <div className="relative flex h-1.5 w-1.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
                         </div>
-                        <span className="text-xs font-semibold whitespace-nowrap bg-white/20 px-2 py-1 rounded">LIVE</span>
+                        <span className="text-xs font-semibold">LIVE</span>
                       </div>
                     </div>
 
-                    {/* Compact Score Display */}
-                    <div className="px-4 py-3">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        {match.participants && match.participants.length > 0 ? (
-                          match.participants.map((participant, pidx) => (
+                    {/* Match Content */}
+                    <div className="p-3">
+                      {match.participants && match.participants.length >= 2 ? (
+                        <div className="flex items-center justify-between gap-2">
+                          {/* Team A */}
+                          <motion.div
+                            className="flex-1 text-center"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.1, duration: 0.2 }}
+                          >
+                            <p className="text-xs font-semibold text-gray-700 truncate mb-1">
+                              {(match.participants[0].team?.name || match.participants[0].player?.name || 'Team A').substring(0, 10)}
+                            </p>
                             <motion.div
-                              key={participant.id}
-                              className="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:border-blue-400 transition-colors text-center"
-                              initial={{ opacity: 0, scale: 0.95 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: 0.2 + pidx * 0.05, duration: 0.2 }}
-                              whileHover={{ scale: 1.02 }}
+                              className="text-3xl font-bold text-blue-600"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.15, duration: 0.3 }}
                             >
-                              <div className="flex items-center justify-between gap-2 mb-2">
-                                <p className="text-xs font-semibold text-gray-700 truncate flex-1">
-                                  {participant.team?.name || participant.player?.name || 'Unknown'}
-                                </p>
-                                {match.status === 'FINISHED' && getWinnerName(match) === (participant.team?.name || participant.player?.name) && (
-                                  <motion.div
-                                    initial={{ scale: 0, rotate: -180 }}
-                                    animate={{ scale: 1, rotate: 0 }}
-                                    transition={{ type: 'spring', stiffness: 200 }}
-                                  >
-                                    <Trophy className="w-4 h-4 text-yellow-500 flex-shrink-0" />
-                                  </motion.div>
-                                )}
-                              </div>
-
-                              <motion.div 
-                                className="text-2xl font-bold text-gray-900 mb-1"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.25 + pidx * 0.05, duration: 0.3 }}
-                              >
-                                {participant.score}
-                              </motion.div>
-
-                              <div className="text-xs text-gray-600 space-y-0.5">
-                                {participant.pointsEarned !== undefined && (
-                                  <p>Pts: <span className="font-semibold">{participant.pointsEarned}</span></p>
-                                )}
-                                {participant.result && (
-                                  <p className="text-blue-600 font-semibold">{participant.result}</p>
-                                )}
-                              </div>
+                              {match.participants[0].score}
                             </motion.div>
-                          ))
-                        ) : (
-                          <p className="col-span-2 md:col-span-4 text-gray-600 text-sm py-4 text-center">No participants added yet</p>
-                        )}
-                      </div>
+                            <p className="text-[10px] text-gray-600 mt-0.5">
+                              Pts: {match.participants[0].pointsEarned || 0}
+                            </p>
+                            {match.status === 'FINISHED' && getWinnerName(match) === (match.participants[0].team?.name || match.participants[0].player?.name) && (
+                              <motion.div
+                                className="flex justify-center mt-1"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: 'spring', stiffness: 200 }}
+                              >
+                                <Trophy className="w-4 h-4 text-yellow-500" />
+                              </motion.div>
+                            )}
+                          </motion.div>
+
+                          {/* VS Divider */}
+                          <div className="text-center px-1">
+                            <p className="text-xs font-bold text-gray-400">VS</p>
+                          </div>
+
+                          {/* Team B */}
+                          <motion.div
+                            className="flex-1 text-center"
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.1, duration: 0.2 }}
+                          >
+                            <p className="text-xs font-semibold text-gray-700 truncate mb-1">
+                              {(match.participants[1].team?.name || match.participants[1].player?.name || 'Team B').substring(0, 10)}
+                            </p>
+                            <motion.div
+                              className="text-3xl font-bold text-blue-600"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.15, duration: 0.3 }}
+                            >
+                              {match.participants[1].score}
+                            </motion.div>
+                            <p className="text-[10px] text-gray-600 mt-0.5">
+                              Pts: {match.participants[1].pointsEarned || 0}
+                            </p>
+                            {match.status === 'FINISHED' && getWinnerName(match) === (match.participants[1].team?.name || match.participants[1].player?.name) && (
+                              <motion.div
+                                className="flex justify-center mt-1"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: 'spring', stiffness: 200 }}
+                              >
+                                <Trophy className="w-4 h-4 text-yellow-500" />
+                              </motion.div>
+                            )}
+                          </motion.div>
+                        </div>
+                      ) : (
+                        <p className="text-gray-600 text-xs py-4 text-center">Waiting for participants...</p>
+                      )}
                     </div>
                   </motion.div>
                 </CardTransition>
