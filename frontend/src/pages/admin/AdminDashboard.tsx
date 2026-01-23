@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useSocket } from '../../contexts/SocketContext'
 import { Trophy, Users, Calendar, Wifi, WifiOff, TrendingUp } from 'lucide-react'
 import { api } from '../../config/api'
+import { StatsSkeleton, LeaderboardSkeleton } from '../../components/Skeleton'
 
 interface Faculty {
   id: string
@@ -20,10 +21,13 @@ export const AdminDashboard: React.FC = () => {
   })
   const [leaderboard, setLeaderboard] = useState<Faculty[]>([])
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false)
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        setLoading(true)
         const [facultiesRes, teamsRes, matchesRes] = await Promise.all([
           api.get('/faculties'),
           api.get('/teams'),
@@ -45,6 +49,8 @@ export const AdminDashboard: React.FC = () => {
         })
       } catch (err) {
         console.error('Failed to fetch stats:', err)
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -70,10 +76,13 @@ export const AdminDashboard: React.FC = () => {
 
   const fetchLeaderboard = async () => {
     try {
+      setLeaderboardLoading(true)
       const response = await api.get('/points/leaderboard')
       setLeaderboard(response.data.data || [])
     } catch (err) {
       console.error('Failed to fetch leaderboard:', err)
+    } finally {
+      setLeaderboardLoading(false)
     }
   }
 
@@ -101,41 +110,51 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm font-medium">Total Faculties</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.faculties}</p>
+        {loading ? (
+          <>
+            <StatsSkeleton />
+            <StatsSkeleton />
+            <StatsSkeleton />
+          </>
+        ) : (
+          <>
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm font-medium">Total Faculties</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{stats.faculties}</p>
+                </div>
+                <div className="bg-primary/10 p-3 rounded-full">
+                  <Trophy className="w-8 h-8 text-primary" />
+                </div>
+              </div>
             </div>
-            <div className="bg-primary/10 p-3 rounded-full">
-              <Trophy className="w-8 h-8 text-primary" />
-            </div>
-          </div>
-        </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm font-medium">Total Teams</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.teams}</p>
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm font-medium">Total Teams</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{stats.teams}</p>
+                </div>
+                <div className="bg-secondary/10 p-3 rounded-full">
+                  <Users className="w-8 h-8 text-secondary" />
+                </div>
+              </div>
             </div>
-            <div className="bg-secondary/10 p-3 rounded-full">
-              <Users className="w-8 h-8 text-secondary" />
-            </div>
-          </div>
-        </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm font-medium">Upcoming Matches</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.upcomingMatches}</p>
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm font-medium">Upcoming Matches</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{stats.upcomingMatches}</p>
+                </div>
+                <div className="bg-green-100 p-3 rounded-full">
+                  <Calendar className="w-8 h-8 text-green-600" />
+                </div>
+              </div>
             </div>
-            <div className="bg-green-100 p-3 rounded-full">
-              <Calendar className="w-8 h-8 text-green-600" />
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       {/* Quick Actions */}
@@ -172,7 +191,9 @@ export const AdminDashboard: React.FC = () => {
             <span className="text-xs text-green-600 font-medium">Live Updates</span>
           )}
         </div>
-        {leaderboard.length === 0 ? (
+        {leaderboardLoading ? (
+          <LeaderboardSkeleton />
+        ) : leaderboard.length === 0 ? (
           <p className="text-gray-600 text-center py-8">No standings available yet</p>
         ) : (
           <div className="space-y-2">
