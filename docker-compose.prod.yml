@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: sports-week-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-sports_week}
+      POSTGRES_USER: ${DB_USER:-sports}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sports123}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sports-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-sports}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sports-week-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-sports}:${DB_PASSWORD:-sports123}@postgres:5432/${DB_NAME:-sports_week}
+      JWT_SECRET: ${JWT_SECRET:-samriddhi-sports-week-2026-super-secret-key-change-in-production}
+      PORT: 3001
+      NODE_ENV: ${NODE_ENV:-production}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+    ports:
+      - "${API_PORT:-3001}:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - sports-network
+    healthcheck:
+      test: [ "CMD-SHELL", "bun -e \"fetch('http://localhost:3001/api/health').then(() => process.exit(0)).catch(() => process.exit(1))\"" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # Frontend Web App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sports-week-web
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: ${API_URL:-http://localhost:3001}
+      VITE_SOCKET_URL: ${SOCKET_URL:-http://localhost:3001}
+    ports:
+      - "${WEB_PORT:-5173}:5173"
+    depends_on:
+      - backend
+    networks:
+      - sports-network
+    healthcheck:
+      test: [ "CMD-SHELL", "bun -e \"fetch('http://localhost:5173').then(() => process.exit(0)).catch(() => process.exit(1))\"" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  sports-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
