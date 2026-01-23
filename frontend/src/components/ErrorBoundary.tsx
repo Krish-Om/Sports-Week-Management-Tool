@@ -34,8 +34,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
     // eslint-disable-next-line no-console
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     this.setState({
-      error,
-      errorInfo,
+      error: error,
+      errorInfo: errorInfo,
     });
   }
 
