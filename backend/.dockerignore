@@ -15,5 +15,3 @@ scripts
 drizzle
 dist
 build
-.turbo
-bun.lock
