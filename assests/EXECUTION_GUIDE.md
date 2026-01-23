@@ -126,13 +126,18 @@
 - [x] Socket.io connection verified
 
 ### 🎮 Phase 6: Manager Dashboard (Day 3 - 6 hours)
-- [ ] Create manager-specific layout
-- [ ] Display assigned games list
-- [ ] Build match management interface
-- [ ] Implement live score update UI
-- [ ] Add status toggle (UPCOMING → LIVE → FINISHED)
-- [ ] Emit Socket.io events on score updates
-- [ ] Mobile-first responsive design
+- [x] Create manager-specific layout with sidebar navigation
+- [x] Display assigned games list with card selector
+- [x] Build match management interface with expandable cards
+- [x] Implement live score update UI with +/− buttons
+- [x] Add status toggle (UPCOMING → LIVE → FINISHED)
+- [x] Emit Socket.io events on score updates (scoreUpdate, matchStatusChange)
+- [x] Create participant score update API route (/match-participants)
+- [x] Add getParticipantById and updateParticipantScore methods to MatchService
+- [x] Build ManagerLeaderboard page (placeholder for Phase 8)
+- [x] Mobile-first responsive design
+- [x] Route integration in App.tsx with ManagerLayout
+- [x] Test score updates and status changes
 
 ### 🌍 Phase 7: Public Dashboard (Day 4 - 6 hours)
 - [ ] Create homepage with featured matches

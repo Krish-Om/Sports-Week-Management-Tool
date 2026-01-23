@@ -4,6 +4,7 @@ import { pgTable, uuid, text, integer, timestamp, pgEnum } from 'drizzle-orm/pg-
 export const roleEnum = pgEnum('role', ['ADMIN', 'MANAGER']);
 export const matchStatusEnum = pgEnum('match_status', ['UPCOMING', 'LIVE', 'FINISHED']);
 export const gameTypeEnum = pgEnum('game_type', ['TEAM', 'INDIVIDUAL']);
+export const matchResultEnum = pgEnum('match_result', ['WIN', 'LOSS', 'DRAW']);
 
 // Faculty Table
 export const faculties = pgTable('faculties', {
@@ -62,6 +63,7 @@ export const matches = pgTable('matches', {
   startTime: timestamp('start_time').notNull(),
   venue: text('venue').notNull(),
   status: matchStatusEnum('status').notNull().default('UPCOMING'),
+  winnerId: uuid('winner_id'), // Can be team_id or player_id
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
@@ -73,7 +75,10 @@ export const matchParticipants = pgTable('match_participants', {
   teamId: uuid('team_id').references(() => teams.id, { onDelete: 'cascade' }),
   playerId: uuid('player_id').references(() => players.id, { onDelete: 'cascade' }),
   score: integer('score').notNull().default(0),
+  result: matchResultEnum('result'), // WIN, LOSS, DRAW
   pointsEarned: integer('points_earned').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
 // Type exports

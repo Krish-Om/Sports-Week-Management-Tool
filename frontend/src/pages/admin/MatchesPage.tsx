@@ -118,15 +118,29 @@ export default function MatchesPage() {
       setEditingMatch(match);
       const game = games.find(g => g.id === match.gameId);
       setSelectedGameType(game?.type || null);
-      setFormData({
-        gameId: match.gameId,
-        startTime: new Date(match.startTime).toISOString().slice(0, 16),
-        venue: match.venue,
-        status: match.status,
-        participants: match.participants?.map(p => ({
-          teamId: p.teamId || undefined,
-          playerId: p.playerId || undefined,
-        })) || [],
+      
+      // Fetch full match details including participants
+      api.get(`/matches/${match.id}`).then(response => {
+        const fullMatch = response.data.data;
+        setFormData({
+          gameId: fullMatch.gameId,
+          startTime: new Date(fullMatch.startTime).toISOString().slice(0, 16),
+          venue: fullMatch.venue,
+          status: fullMatch.status,
+          participants: fullMatch.participants?.map((p: any) => ({
+            teamId: p.teamId || undefined,
+            playerId: p.playerId || undefined,
+          })) || [],
+        });
+      }).catch(err => {
+        console.error('Failed to load match details:', err);
+        setFormData({
+          gameId: match.gameId,
+          startTime: new Date(match.startTime).toISOString().slice(0, 16),
+          venue: match.venue,
+          status: match.status,
+          participants: [],
+        });
       });
     } else {
       setEditingMatch(null);

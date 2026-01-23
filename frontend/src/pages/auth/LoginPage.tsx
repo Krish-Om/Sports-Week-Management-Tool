@@ -17,8 +17,15 @@ export const LoginPage: React.FC = () => {
     setIsLoading(true)
 
     try {
-      await login(username, password)
-      navigate('/admin')
+      const { user: newUser } = await login(username, password)
+      // Redirect based on user role
+      if (newUser.role === 'ADMIN') {
+        navigate('/admin')
+      } else if (newUser.role === 'MANAGER') {
+        navigate('/manager')
+      } else {
+        navigate('/')
+      }
     } catch (err: any) {
       setError(err.message || 'Invalid credentials')
     } finally {
