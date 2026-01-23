@@ -1,0 +1,98 @@
+To successfully "vibe code" this project with a full-stack PostgreSQL and Prisma setup, your AI_CONTEXT.md needs to be more than just a list of features. It needs to act as the "Project DNA" that prevents the AI from hallucinating or making conflicting architectural choices.
+
+Below is the refined, high-performance context file. Save this as AI_CONTEXT.md in your project root.
+
+AI_CONTEXT.md
+🎯 Project Vision
+Name: Campus Sports Digitization Hub (MVP) Objective: A real-time sports management system for a 3-day college event. It enables participants to view live scores and authorized managers to update match data instantly via a centralized dashboard.
+
+🛠 Tech Stack (The "Vibe" Stack)
+Frontend: React (Vite) + Tailwind CSS + Lucide-React (Icons)
+
+Backend: Node.js (Express)
+
+Database: PostgreSQL (Self-hosted)
+
+ORM: Prisma (Source of Truth for Schema)
+
+Real-time: Socket.io (Bi-directional updates)
+
+Tunneling: Cloudflare Tunnel (Home server to Web)
+
+🗄 Database Architecture (ERD Context)
+We use a Junction Table (MatchParticipant) to support both Team Sports (Futsal, Cricket) and Individual Sports (Chess, Badminton).
+
+Code snippet
+// KEY PRISMA MODELS
+model Faculty {
+  id          String   @id @default(uuid())
+  name        String   // e.g., CSIT, BCA
+  totalPoints Int      @default(0)
+  players     Player[]
+  teams       Team[]
+}
+
+model Game {
+  id          String   @id @default(uuid())
+  name        String   // Futsal, Chess, etc.
+  type        String   // "TEAM" or "INDIVIDUAL"
+  pointWeight Int      // Weight for Faculty Leaderboard
+  matches     Match[]
+}
+
+model Match {
+  id           String             @id @default(uuid())
+  gameId       String
+  game         Game               @relation(fields: [gameId], references: [id])
+  startTime    DateTime
+  venue        String
+  status       String             @default("UPCOMING") // UPCOMING, LIVE, FINISHED
+  participants MatchParticipant[]
+}
+
+model MatchParticipant {
+  id           String  @id @default(uuid())
+  matchId      String
+  match        Match   @relation(fields: [matchId], references: [id])
+  teamId       String? // Relation to Team
+  playerId     String? // Relation to Player (for Individual sports)
+  score        Int     @default(0)
+  pointsEarned Int     @default(0)
+}
+🚀 Core Workflows for AI
+Real-time Live Scores:
+
+When a manager updates a score in MatchParticipant, the server must emit a scoreUpdate event via Socket.io.
+
+The Public Dashboard must listen for scoreUpdate and update the UI state immediately without a page refresh.
+
+Faculty Leaderboard:
+
+Automate point tallying: When a Match status moves to FINISHED, calculate pointsEarned for participants and update the Faculty.totalPoints.
+
+Role-Based Access:
+
+ADMIN: Full control over Games and Faculties.
+
+MANAGER: Can only update scores and status for Matches assigned to their Game.
+
+🎨 UI/UX Guidelines
+Theme: High-contrast athletic aesthetic. Primary: #2563eb (Blue), Accent: #f97316 (Orange).
+
+Mobile First: Navigation must be thumb-friendly. Use a bottom navigation bar for the public view.
+
+Feedback: Use framer-motion for subtle "pulse" animations on live score changes.
+
+⚠️ Implementation Rules
+No Over-Engineering: Stick to local React state (useState/useEffect) combined with Socket.io.
+
+Type Safety: Always refer to schema.prisma before generating API routes.
+
+Reconnectivity: The frontend must show a "Connection Lost" banner if the socket disconnects.
+
+How to use this with Cursor/Copilot:
+Initialize: npm create vite@latest . -- --template react-ts
+
+Backend Setup: Ask the AI to: "Based on AI_CONTEXT.md, create a docker-compose.yml for Postgres and a schema.prisma file."
+
+Live Logic: Ask: "Implement a Socket.io bridge between my Express server and React frontend to handle real-time match updates."

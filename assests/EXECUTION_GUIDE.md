@@ -1,38 +1,194 @@
-# 🏆 Sports Week Management Tool - Complete Execution Guide
+# 🏆 Samriddhi College Sports Week Management Tool
 
-**Runtime:** Bun (v1.0+)  
-**Framework:** Next.js 15 (App Router)  
-**Database:** PostgreSQL (Supabase)  
-**ORM:** Prisma  
-**UI:** Tailwind CSS + Shadcn/UI + Lucide Icons  
-**Real-time:** Supabase Realtime  
+**College:** Samriddhi College, Nepal  
+**Event:** 3-Day Sports Week  
+**Organizer:** 5th Semester CSIT Students  
+**Faculties:** CSIT, BCA, BSW, BBS  
+
+**Tech Stack (Per AI_CONTEXT.prompt.txt - HIGHEST PRIORITY):**
+- **Runtime:** Bun (v1.0+)  
+- **Frontend:** React (Vite) + Tailwind CSS + Lucide-React Icons  
+- **Backend:** Express.js (running on Bun)  
+- **Database:** PostgreSQL (Docker - Local on port 5433)  
+- **ORM:** Prisma (Source of Truth for Schema)  
+- **Real-time:** Socket.io (Bi-directional updates)  
+- **Auth:** Simple JWT with Pre-seeded Accounts (No Public Registration)  
+- **Tunneling:** Cloudflare Tunnel (Home server to Web)
+
+**Authentication Strategy for Small Private Event:**
+- ✅ **No Self-Registration:** Admin pre-creates all user accounts
+- ✅ **Username/Password Login:** Simple credentials (e.g., "futsal_manager", "chess_manager")
+- ✅ **JWT Tokens:** Stateless authentication with 7-day expiry
+- ✅ **Role-Based Access:** Only ADMIN and MANAGER roles
+- ✅ **Manual User Management:** Admin can add/remove managers via dashboard
+- ❌ **No Email Verification:** Not needed for known college organizers
+- ❌ **No Password Reset Flow:** Admin can manually reset in database
+- ❌ **No OAuth/Social Login:** Unnecessary complexity for 3-day event  
 
 **Target Timeline:** 4-5 Days  
-**Last Updated:** January 22, 2026
+**Last Updated:** January 23, 2026
 
 ---
 
-## 📊 System Architecture
+## 📝 PROJECT TODO LIST (Based on AI_CONTEXT.prompt.txt)
+
+### ✅ Phase 0: Infrastructure Setup (COMPLETED)
+- [x] PostgreSQL Docker container running (port 5433)
+- [x] Database ERD designed (7 entities)
+- [x] Project documentation created
+
+### ✅ Phase 1: Backend Foundation (COMPLETED - Day 1)
+- [x] Initialize Express server with Bun runtime in `/backend`
+- [x] Setup Drizzle ORM with PostgreSQL connection (port 5433)
+- [x] Create complete schema from ERD (Faculty, Player, Game, Team, Match, MatchParticipant, User)
+- [x] Push schema to database and verified
+- [x] Create seed script with initial data (4 faculties, admin user, sample managers)
+- [x] Setup JWT authentication middleware with role-based access
+- [x] Create Express API structure with clean architecture
+- [x] Implement service layer for database operations
+- [x] Add comprehensive error handling
+- [x] Create faculty CRUD endpoints
+
+### ✅ Phase 2: Code Refactoring (COMPLETED)
+- [x] Organized code into clean architecture (config, services, routes, middleware)
+- [x] Centralized environment configuration
+- [x] Added TypeScript types and interfaces
+- [x] Implemented service layer pattern
+- [x] Added error handling middleware
+- [x] Created consistent API response format
+
+### 🔌 Phase 3: Socket.io Integration (PARTIALLY COMPLETED)
+- [x] Install and configure Socket.io on Express server
+- [x] Create Socket.io event handlers (scoreUpdate, matchStatusChange, leaderboardUpdate)
+- [x] Implement reconnection logic on server
+- [ ] Test bi-directional communication with frontend
+
+### 🎨 Phase 3: Frontend React Setup (Day 1-2 - 3 hours)
+- [ ] Initialize React with Vite in `/frontend`
+- [ ] Install dependencies (Tailwind CSS, Lucide-React, Socket.io-client, framer-motion)
+- [ ] Configure Tailwind with athletic theme (#2563eb Blue, #f97316 Orange)
+- [ ] Setup React Router for navigation
+- [ ] Create Socket.io client connection with reconnection handling
+- [ ] Implement "Connection Lost" banner component
+
+### 🔐 Phase 4: Authentication System (Day 2 - 3 hours)
+- [ ] Create JWT-based login API endpoint
+- [ ] Implement password hashing (bcrypt)
+- [ ] Build simple login page with username/password
+- [ ] Create protected route HOC/wrapper
+- [ ] Setup role-based access control (ADMIN, MANAGER)
+- [ ] Admin dashboard: User management (create/delete managers)
+- [ ] Seed script: Create initial admin + sample managers
+
+### 👨‍💼 Phase 5: Admin Dashboard (Day 2 - 8 hours)
+- [ ] Create admin layout with navigation
+- [ ] Build CRUD operations for Faculties
+- [ ] Build CRUD operations for Games
+- [ ] Build CRUD operations for Teams
+- [ ] Build CRUD operations for Players
+- [ ] Build CRUD operations for Users (organizers)
+- [ ] Build CRUD operations for Matches
+- [ ] Connect all forms to Express API endpoints
+
+### 🎮 Phase 6: Manager Dashboard (Day 3 - 6 hours)
+- [ ] Create manager-specific layout
+- [ ] Display assigned games list
+- [ ] Build match management interface
+- [ ] Implement live score update UI
+- [ ] Add status toggle (UPCOMING → LIVE → FINISHED)
+- [ ] Emit Socket.io events on score updates
+- [ ] Mobile-first responsive design
+
+### 🌍 Phase 7: Public Dashboard (Day 4 - 6 hours)
+- [ ] Create homepage with featured matches
+- [ ] Build fixtures listing page with filters
+- [ ] Implement live matches page with Socket.io listeners
+- [ ] Create completed matches/results page
+- [ ] Build faculty leaderboard page (real-time updates)
+- [ ] Add game-specific views
+- [ ] Implement bottom navigation bar for mobile
+- [ ] Add framer-motion pulse animations for live score changes
+
+### 📊 Phase 8: Points Calculation Logic (Day 5 - 3 hours)
+- [ ] Create automatic points calculation API endpoint
+- [ ] Implement points distribution based on game weight
+- [ ] Update Faculty.totalPoints when match finishes
+- [ ] Emit Socket.io event for leaderboard updates
+- [ ] Add points history tracking (optional)
+
+### 🎨 Phase 9: UI Polish & Testing (Day 5 - 3 hours)
+- [ ] Add loading states and animations
+- [ ] Implement error boundaries and error handling
+- [ ] Create toast notifications
+- [ ] Add framer-motion animations
+- [ ] Test all CRUD operations
+- [ ] Verify Socket.io real-time updates
+- [ ] Test role-based access control
+- [ ] Mobile responsiveness testing
+- [ ] Cross-browser testing
+
+### 🚀 Phase 10: Deployment Setup (Day 5 - 2 hours)
+- [ ] Setup Cloudflare Tunnel for backend
+- [ ] Configure production environment variables
+- [ ] Build frontend for production
+- [ ] Setup production PostgreSQL (or keep local)
+- [ ] Configure CORS for production domains
+- [ ] Test production deployment
+- [ ] Setup monitoring/logging
+
+---
+
+## 🎯 CRITICAL IMPLEMENTATION RULES (From AI_CONTEXT.prompt.txt)
+
+1. **Type Safety:** Always refer to `schema.prisma` before generating API routes
+2. **No Over-Engineering:** Use local React state (useState/useEffect) + Socket.io
+3. **Real-time First:** All score updates MUST emit Socket.io events immediately
+4. **Mobile First:** Bottom navigation, thumb-friendly UI
+5. **Reconnectivity:** Frontend MUST show "Connection Lost" banner on socket disconnect
+6. **Role-Based Access:**
+   - ADMIN: Full control (Games, Faculties, Users, all CRUD operations)
+   - MANAGER: Can only update scores/status for their assigned Game
+7. **Authentication for Private Event:**
+   - No public registration or signup page
+   - Admin pre-creates all manager accounts with simple credentials
+   - Example: `username: "futsal_manager"`, `password: "futsal2026"`
+   - Managers get credentials verbally/via WhatsApp from admin
+   - Simple login page with username/password only
+
+---
+
+## 📊 System Architecture (Per AI_CONTEXT.prompt.txt)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Public Dashboard                          │
-│  (Live Fixtures, Results, Leaderboard - Real-time Updates)  │
+│              Public Dashboard (React + Vite)                 │
+│     (Live Fixtures, Faculty Leaderboard, Results)           │
+│              Socket.io Client (Real-time Updates)            │
 └──────────────────┬──────────────────────────────────────────┘
-                   │ Supabase Realtime Subscription
+                   │ Socket.io (Bi-directional)
+                   ├─ scoreUpdate events
+                   ├─ matchStatusChange events
+                   └─ leaderboardUpdate events
+                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│         Express Backend (Bun Runtime)                        │
+│  ┌────────────────┬───────────────┬──────────────────┐     │
+│  │ REST API       │ Socket.io     │ JWT Auth         │     │
+│  │ Endpoints      │ Server        │ Middleware       │     │
+│  └────────────────┴───────────────┴──────────────────┘     │
+│                    Prisma ORM                                │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
                    ▼
          ┌─────────────────────┐
-         │  PostgreSQL + RLS   │◄────────┐
-         │   (Supabase)        │         │
-         └─────────────────────┘         │
-                   ▲                     │
-                   │ Prisma Queries      │ Server Actions
-                   │                     │
-┌──────────────────┴─────────────────────┴─────────────────────┐
-│              Next.js 15 App Router (Bun Runtime)             │
-├──────────────────────────────────────────────────────────────┤
-│  Admin Dashboard  │  Manager Dashboard  │  Auth Middleware   │
-└──────────────────────────────────────────────────────────────┘
+         │  PostgreSQL         │
+         │  (Docker: 5433)     │
+         └─────────────────────┘
+                   
+┌─────────────────────────────────────────────────────────────┐
+│                    Cloudflare Tunnel                         │
+│              (Home Server to Public Web)                     │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -58,105 +214,519 @@ git --version
 ### Step 0.2: Environment Verification Checklist
 
 - [ ] Bun v1.0+ installed
-- [ ] Git configured
+- [ ] Docker & Docker Compose installed
 - [ ] Code editor ready (VS Code recommended)
-- [ ] Supabase account created
-- [ ] Domain model understood (see entity-relation.mermaid)
+- [ ] Domain model understood (see DatabaseEntityDiagram.mermaid)
 
 ---
 
-## 🗄️ Phase 1: Database Architecture (Day 1 - 4 hours)
+## 🗄️ Phase 1: Backend & Database Setup (Day 1 - 4 hours)
 
-### Step 1.1: Create Supabase Project
-
-1. Go to [supabase.com](https://supabase.com)
-2. Create new project: `sports-week-prod`
-3. Note down:
-   - Project URL: `https://xxxxx.supabase.co`
-   - Anon/Public Key: `eyJhbGc...`
-   - Database Password: (secure storage)
-
-### Step 1.2: Get Connection String
-
-Navigate to: **Project Settings → Database → Connection String (Direct)**
-
-Format:
-```
-postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres
-```
-
-### Step 1.3: Initialize Next.js Project with Bun
+### Step 1.1: Initialize Backend with Bun
 
 ```bash
-cd /home/krishom/Sports-Week-Management-Tool
+# Navigate to backend folder
+cd backend
 
-# Create Next.js app in frontend folder
-bunx create-next-app@latest frontend \
-  --typescript \
-  --tailwind \
-  --app \
-  --use-bun \
-  --no-src-dir \
-  --import-alias "@/*"
+# Initialize Bun project
+bun init -y
 
-cd frontend
+# Install core dependencies
+bun add express prisma @prisma/client socket.io cors dotenv jsonwebtoken bcryptjs
+bun add -d @types/express @types/cors @types/jsonwebtoken @types/bcryptjs typescript @types/node
+
+# Create basic folder structure
+mkdir -p src/routes src/controllers src/middleware src/config
 ```
 
-### Step 1.4: Install Dependencies
+### Step 1.2: Setup Local PostgreSQL with Docker
+
+Create `backend/docker-compose.yml`:
+
+```yaml
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sports-week-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sports_week
+      POSTGRES_USER: sports
+      POSTGRES_PASSWORD: sports123
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+```
+
+Start the database:
+```bash
+cd backend
+docker compose up -d
+```
+
+### Step 1.3: Verify Database Connection
 
 ```bash
-# Core dependencies
-bun add @supabase/supabase-js @supabase/ssr
-bun add @prisma/client
-bun add -d prisma
+# Check if container is running
+docker ps | grep sports-week-db
 
-# UI Components
-bunx shadcn-ui@latest init
+# Should see: sports-week-db running on port 5433
+```
 
-# Select options:
-# - Style: Default
-# - Base color: Slate
-# - CSS variables: Yes
+### Step 1.4: Setup Prisma Schema
 
-# Install essential components
-bunx shadcn-ui@latest add button
-bunx shadcn-ui@latest add card
-bunx shadcn-ui@latest add badge
-bunx shadcn-ui@latest add table
-bunx shadcn-ui@latest add dialog
-bunx shadcn-ui@latest add form
-bunx shadcn-ui@latest add input
-bunx shadcn-ui@latest add select
-bunx shadcn-ui@latest add label
-bunx shadcn-ui@latest add toast
-bunx shadcn-ui@latest add dropdown-menu
-bunx shadcn-ui@latest add tabs
+Create `backend/prisma/schema.prisma`:
+
+### Step 1.4: Setup Prisma Schema
+
+Create `backend/prisma/schema.prisma`:
+
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Enums
+enum Role {
+  ADMIN
+  MANAGER
+}
+
+enum MatchStatus {
+  UPCOMING
+  LIVE
+  FINISHED
+}
+
+enum GameType {
+  TEAM
+  INDIVIDUAL
+}
+
+// Core Models
+model Faculty {
+  id          String   @id @default(uuid())
+  name        String   @unique // "CSIT", "BCA", "BSW", "BBS"
+  totalPoints Int      @default(0) @map("total_points")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  teams   Team[]
+  players Player[]
+
+  @@map("faculties")
+}
+
+model Player {
+  id        String   @id @default(uuid())
+  name      String
+  facultyId String   @map("faculty_id")
+  faculty   Faculty  @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  semester  String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  matchParticipants MatchParticipant[]
+
+  @@index([facultyId])
+  @@map("players")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String // Hashed password
+  role      Role     @default(MANAGER)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  games Game[]
+
+  @@map("users")
+}
+
+model Game {
+  id          String   @id @default(uuid())
+  name        String   @unique // "Futsal", "Chess", etc.
+  type        GameType
+  pointWeight Int      @default(1) @map("point_weight")
+  managerId   String?  @map("manager_id")
+  manager     User?    @relation(fields: [managerId], references: [id])
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  matches Match[]
+  teams   Team[]
+
+  @@index([managerId])
+  @@map("games")
+}
+
+model Team {
+  id        String   @id @default(uuid())
+  name      String
+  facultyId String   @map("faculty_id")
+  faculty   Faculty  @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  gameId    String   @map("game_id")
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  matchParticipants MatchParticipant[]
+
+  @@unique([facultyId, gameId, name])
+  @@index([facultyId])
+  @@index([gameId])
+  @@map("teams")
+}
+
+model Match {
+  id        String      @id @default(uuid())
+  gameId    String      @map("game_id")
+  game      Game        @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  startTime DateTime    @map("start_time")
+  venue     String
+  status    MatchStatus @default(UPCOMING)
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  participants MatchParticipant[]
+
+  @@index([gameId])
+  @@index([status])
+  @@map("matches")
+}
+
+model MatchParticipant {
+  id           String  @id @default(uuid())
+  matchId      String  @map("match_id")
+  match        Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  teamId       String? @map("team_id")
+  team         Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  playerId     String? @map("player_id")
+  player       Player? @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  score        Int     @default(0)
+  pointsEarned Int     @default(0) @map("points_earned")
+
+  @@index([matchId])
+  @@index([teamId])
+  @@index([playerId])
+  @@map("match_participants")
+}
 ```
 
 ### Step 1.5: Setup Environment Variables
 
-Create `frontend/.env.local`:
+Create `backend/.env`:
 
 ```env
 # Database
-DATABASE_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
-DIRECT_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
+DATABASE_URL="postgresql://sports:sports123@localhost:5433/sports_week"
 
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL="https://xxxxx.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGc..."
-SUPABASE_SERVICE_ROLE_KEY="eyJhbGc..." # From API settings
+# JWT Secret
+JWT_SECRET="your-super-secret-jwt-key-change-in-production-min-32-characters"
+
+# Server
+PORT=3001
+NODE_ENV=development
 ```
 
-### Step 1.6: Create Prisma Schema
+### Step 1.6: Push Schema to Database
 
-Create `frontend/prisma/schema.prisma`:
+```bash
+cd backend
 
-```prisma
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+# Initialize Prisma
+bunx prisma init
+
+# Generate Prisma Client
+bunx prisma generate
+
+# Push schema to database
+bunx prisma db push
+
+# Open Prisma Studio to verify
+bunx prisma studio
+```
+
+### Step 1.7: Create Seed Data
+
+Create `backend/prisma/seed.ts`:
+
+```typescript
+import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  console.log('🌱 Starting seed...')
+
+  // Create Faculties
+  const faculties = await Promise.all([
+    prisma.faculty.upsert({
+      where: { name: 'CSIT' },
+      update: {},
+      create: { name: 'CSIT' },
+    }),
+    prisma.faculty.upsert({
+      where: { name: 'BCA' },
+      update: {},
+      create: { name: 'BCA' },
+    }),
+    prisma.faculty.upsert({
+      where: { name: 'BSW' },
+      update: {},
+      create: { name: 'BSW' },
+    }),
+    prisma.faculty.upsert({
+      where: { name: 'BBS' },
+      update: {},
+      create: { name: 'BBS' },
+    }),
+  ])
+
+  console.log('✅ Faculties created:', faculties.length)
+
+  // Create Admin User
+  const hashedPassword = await bcrypt.hash('admin123', 10)
+  const admin = await prisma.user.upsert({
+    where: { username: 'admin' },
+    update: {},
+    create: {
+      username: 'admin',
+      password: hashedPassword,
+      role: 'ADMIN',
+    },
+  })
+
+  console.log('✅ Admin user created:', admin.username)
+  console.log('🎉 Seed completed successfully!')
+}
+
+main()
+  .catch((e) => {
+    console.error('❌ Seed failed:', e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
+```
+
+Add to `backend/package.json`:
+```json
+{
+  "scripts": {
+    "seed": "bun run prisma/seed.ts"
+  }
+}
+```
+
+Run seed:
+```bash
+bun run seed
+```
+
+---
+
+## 🔐 Phase 2: Express Server & JWT Auth (Day 1-2 - 4 hours)
+
+### Step 2.1: Create Express Server
+
+Create `backend/src/index.ts`:
+
+```typescript
+import express from 'express'
+import cors from 'cors'
+import dotenv from 'dotenv'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+
+dotenv.config()
+
+const app = express()
+const httpServer = createServer(app)
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true,
+  },
+})
+
+// Middleware
+app.use(cors())
+app.use(express.json())
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Sports Week API is running' })
+})
+
+// Socket.io connection
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id)
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id)
+  })
+})
+
+const PORT = process.env.PORT || 3001
+
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`)
+  console.log(`🔌 Socket.io ready for connections`)
+})
+
+export { io }
+```
+
+Add start script to `backend/package.json`:
+```json
+{
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts",
+    "seed": "bun run prisma/seed.ts"
+  }
+}
+```
+
+### Step 2.2: Create JWT Middleware
+
+Create `backend/src/middleware/auth.ts`:
+
+```typescript
+import { Request, Response, NextFunction } from 'express'
+import jwt from 'jsonwebtoken'
+
+export interface AuthRequest extends Request {
+  user?: {
+    id: string
+    username: string
+    role: string
+  }
+}
+
+export const authenticateToken = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' })
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET!, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid or expired token' })
+    }
+    req.user = decoded as any
+    next()
+  })
+}
+
+export const requireAdmin = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  if (req.user?.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Admin access required' })
+  }
+  next()
+}
+```
+
+### Step 2.3: Create Auth Routes
+
+Create `backend/src/routes/auth.ts`:
+
+```typescript
+import { Router } from 'express'
+import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
+
+const router = Router()
+const prisma = new PrismaClient()
+
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body
+
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password required' })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { username },
+    })
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' })
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password)
+
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Invalid credentials' })
+    }
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      },
+      process.env.JWT_SECRET!,
+      { expiresIn: '7d' }
+    )
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      },
+    })
+  } catch (error) {
+    console.error('Login error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+export default router
+```
+
+Update `backend/src/index.ts` to include auth routes:
+
+```typescript
+import authRoutes from './routes/auth'
+
+// ... existing code ...
+
+app.use('/api/auth', authRoutes)
+```
+
+---
+
+## 🎨 Phase 3: Frontend React Vite Setup (Day 2 - 3 hours)
 }
 
 generator client {
@@ -193,7 +763,8 @@ enum MatchStage {
   FINAL
 }
 
-// Core Models
+// Core ModelsSW", "BBS" (Samriddhi College)
+  colorCode   String?  @map("color_code") // For UI styling
 model Faculty {
   id          String   @id @default(uuid())
   name        String   @unique // "CSIT", "BCA", "BBS", "BSW"
@@ -225,7 +796,8 @@ model Player {
 
 model Organizer {
   id        String   @id @default(uuid())
-  name      String
+  email     String   @unique
+  password  String   // Hashed password
   authId    String   @unique @map("auth_id") // Supabase User ID
   role      Role     @default(GAME_MANAGER)
   createdAt DateTime @default(now()) @map("created_at")
@@ -236,15 +808,16 @@ model Organizer {
   @@map("organizers")
 }
 
-model Game {
-  id          String   @id @default(uuid())
-  name        String   @unique // "Futsal", "Chess", "Valorant"
+model Game { @id @default(uuid())
+  name        String    @unique // "Futsal", "Chess", "Valorant", "Basketball"
   type        GameType
-  organizerId String   @map("organizer_id")
+  pointWeight Int       @default(1) @map("point_weight") // Weight for leaderboard calculation
+  organizerId String    @map("organizer_id")
   organizer   Organizer @relation(fields: [organizerId], references: [id])
-  rulesText   String?  @map("rules_text") @db.Text
-  icon        String?  // Lucide icon name
-  createdAt   DateTime @default(now()) @map("created_at")
+  rulesText   String?   @map("rules_text") @db.Text
+  icon        String?   // Lucide icon name
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   matches Match[]
@@ -292,15 +865,16 @@ model Match {
   @@map("matches")
 }
 
-model MatchParticipant {
-  id       String       @id @default(uuid())
-  matchId  String       @map("match_id")
-  match    Match        @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  teamId   String?      @map("team_id") // NULL for individual games
-  team     Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  playerId String?      @map("player_id") // NULL for team games
-  player   Player?      @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  score    Int          @default(0)
+model Match     String       @id @default(uuid())
+  matchId       String       @map("match_id")
+  match         Match        @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  teamId        String?      @map("team_id") // NULL for individual games
+  team          Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  playerId      String?      @map("player_id") // NULL for team games
+  player        Player?      @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  score         Int          @default(0)
+  result        MatchResult?
+  pointsEarned  Int          @default(0) @map("points_earned") // Points contributed to faculty @default(0)
   result   MatchResult?
 
   @@index([matchId])
@@ -309,15 +883,31 @@ model MatchParticipant {
   @@map("match_participants")
 }
 ```
+Create Prisma Config (Prisma 7)
 
-### Step 1.7: Push Schema to Database
+Create `frontend/prisma/prisma.config.ts`:
+
+```typescript
+import { defineConfig } from 'prisma/config'
+
+export default defineConfig({
+  datasources: {
+    db: {
+      url: 'postgresql://postgres:postgres123@localhost:5432/sports_week',
+    },
+  },
+})
+```
+
+### Step 1.8: Push Schema to Database
 
 ```bash
 cd frontend
 
-# Initialize Prisma
+# Generate Prisma Client
 bunx prisma generate
 
+# Push schema to local PostgreSQL
 # Push schema to Supabase
 bunx prisma db push
 
@@ -325,7 +915,7 @@ bunx prisma db push
 bunx prisma studio
 ```
 
-### Step 1.8: Setup Prisma Client
+### Step 1.9: Setup Prisma Client
 
 Create `frontend/lib/prisma.ts`:
 
@@ -345,235 +935,312 @@ export const prisma =
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 ```
 
+### Step 1.10: Seed Initial Data
+
+Create `frontend/prisma/seed.ts`:
+
+```typescript
+import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  // Create Faculties (Samriddhi College)
+  const faculties = await Promise.all([
+    prisma.faculty.upsert({
+      where: { name: 'CSIT' },
+      update: {},
+      create: { name: 'CSIT', colorCode: '#3B82F6' }, // Blue
+    }),
+    prisma.faculty.upsert({
+      where: { name: 'BCA' },
+      update: {},
+      create: { name: 'BCA', colorCode: '#10B981' }, // Green
+    }),
+    prisma.faculty.upsert({
+      where: { name: 'BSW' },
+      update: {},
+      create: { name: 'BSW', colorCode: '#F59E0B' }, // Orange
+    }),
+    prisma.faculty.upsert({
+      where: { name: 'BBS' },
+      update: {},
+      create: { name: 'BBS', colorCode: '#EF4444' }, // Red
+    }),
+  ])
+
+  // Create Admin Organizer (5th Sem CSIT Lead)
+  const hashedPassword = await bcrypt.hash('admin123', 10)
+  await prisma.organizer.upsert({
+    where: { email: 'admin@samriddhi.edu.np' },
+    update: {},
+    create: {
+      name: 'CSIT 5th Sem Lead',
+      email: 'admin@samriddhi.edu.np',
+      password: hashedPassword,
+      role: 'ADMIN',
+    },
+  })
+
+  console.log('✅ Seed data inserted successfully!')
+}
+
+main()
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
+```
+
+Add to `package.json`:
+```json
+{
+  "prisma": {
+    "seed": "bun run prisma/seed.ts"
+  }
+}
+```
+
+Run seed:
+```bash
+bun run prisma/seed.ts
+```
+
 ---
 
-## 🔐 Phase 2: Authentication & Authorization (Day 1-2 - 3 hours)
+## 🔐 Phase 2: Authentication with NextAuth.js (Day 1-2 - 3 hours)
 
-### Step 2.1: Setup Supabase Client
+### Step 2.1: Setup NextAuth Configuration
 
-Create `frontend/lib/supabase/client.ts`:
-
-```typescript
-import { createBrowserClient } from '@supabase/ssr'
-
-export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-}
-```
-
-Create `frontend/lib/supabase/server.ts`:
+Create `frontend/lib/auth.ts`:
 
 ```typescript
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { NextAuthOptions } from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import bcrypt from 'bcryptjs'
+import { prisma } from '@/lib/prisma'
 
-export async function createClient() {
-  const cookieStore = await cookies()
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value, ...options })
-          } catch (error) {
-            // Handle cookie errors
-          }
-        },
-        remove(name: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value: '', ...options })
-          } catch (error) {
-            // Handle cookie errors
-          }
-        },
+export const authOptions: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
-    }
-  )
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null
+        }
+
+        const organizer = await prisma.organizer.findUnique({
+          where: { email: credentials.email },
+        })
+
+        if (!organizer) {
+          return null
+        }
+
+        const passwordMatch = await bcrypt.compare(
+          credentials.password,
+          organizer.password
+        )
+
+        if (!passwordMatch) {
+          return null
+        }
+
+        return {
+          id: organizer.id,
+          email: organizer.email,
+          name: organizer.name,
+          role: organizer.role,
+        }
+      },
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role
+        token.id = user.id
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.role = token.role as string
+        session.user.id = token.id as string
+      }
+      return session
+    },
+  },
+  pages: {
+    signIn: '/login',
+  },
+  session: {
+    strategy: 'jwt',
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 }
 ```
 
-### Step 2.2: Create Middleware for Route Protection
+### Step 2.2: Create NextAuth API Route
+
+Create `frontend/app/api/auth/[...nextauth]/route.ts`:
+
+```typescript
+import NextAuth from 'next-auth'
+import { authOptions } from '@/lib/auth'
+
+const handler = NextAuth(authOptions)
+
+export { handler as GET, handler as POST }
+```
+
+### Step 2.3: Create Auth Types
+
+Create `frontend/types/next-auth.d.ts`:
+
+```typescript
+import 'next-auth'
+
+declare module 'next-auth' {
+  interface User {
+    role?: string
+  }
+  
+  interface Session {
+    user: {
+      id: string
+      email: string
+      name: string
+      role: string
+    }
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    role?: string
+    id?: string
+  }
+}
+```
+
+### Step 2.4: Create Middleware for Route Protection
 
 Create `frontend/middleware.ts`:
 
 ```typescript
-import { type NextRequest, NextResponse } from 'next/server'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { withAuth } from 'next-auth/middleware'
+import { NextResponse } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
+export default withAuth(
+  function middleware(req) {
+    const token = req.nextauth.token
+    const path = req.nextUrl.pathname
+
+    // Protect admin routes
+    if (path.startsWith('/admin') && token?.role !== 'ADMIN') {
+      return NextResponse.redirect(new URL('/', req.url))
+    }
+
+    // Protect manager routes
+    if (path.startsWith('/manager') && !token) {
+      return NextResponse.redirect(new URL('/login', req.url))
+    }
+
+    return NextResponse.next()
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token,
     },
-  })
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-        },
-      },
-    }
-  )
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Protect admin routes
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    if (!user) {
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
-    // Additional role check would go here
   }
-
-  // Protect manager routes
-  if (request.nextUrl.pathname.startsWith('/manager')) {
-    if (!user) {
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
-  }
-
-  return response
-}
+)
 
 export const config = {
   matcher: ['/admin/:path*', '/manager/:path*'],
 }
 ```
 
-### Step 2.3: Enable Email Auth in Supabase
+### Step 2.5: Create Login Page
 
-1. Go to: **Authentication → Providers**
-2. Enable **Email** provider
-3. Configure email templates (optional)
-4. Disable email confirmation for development:
-   - **Authentication → Settings → Enable email confirmations: OFF**
+Create `frontend/app/login/page.tsx`:
 
-### Step 2.4: Setup Row Level Security (RLS)
+```typescript
+'use client'
 
-Execute in Supabase SQL Editor:
+import { signIn } from 'next-auth/react'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
-```sql
--- Enable RLS on all tables
-ALTER TABLE faculties ENABLE ROW LEVEL SECURITY;
-ALTER TABLE players ENABLE ROW LEVEL SECURITY;
-ALTER TABLE organizers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE games ENABLE ROW LEVEL SECURITY;
-ALTER TABLE teams ENABLE ROW LEVEL SECURITY;
-ALTER TABLE matches ENABLE ROW LEVEL SECURITY;
-ALTER TABLE match_participants ENABLE ROW LEVEL SECURITY;
+export default function LoginPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const router = useRouter()
 
--- Create function to get organizer role
-CREATE OR REPLACE FUNCTION get_organizer_role(user_id uuid)
-RETURNS text AS $$
-  SELECT role::text FROM organizers WHERE auth_id::uuid = user_id LIMIT 1;
-$$ LANGUAGE sql SECURITY DEFINER;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    })
 
--- Public read access for faculties
-CREATE POLICY "Public read access" ON faculties FOR SELECT USING (true);
+    if (result?.error) {
+      setError('Invalid credentials')
+    } else {
+      router.push('/admin')
+    }
+  }
 
--- Admins can do everything on faculties
-CREATE POLICY "Admin full access" ON faculties FOR ALL 
-  USING (get_organizer_role(auth.uid()) = 'ADMIN');
-
--- Public read access for players
-CREATE POLICY "Public read access" ON players FOR SELECT USING (true);
-CREATE POLICY "Admin full access" ON players FOR ALL 
-  USING (get_organizer_role(auth.uid()) = 'ADMIN');
-
--- Public read access for games
-CREATE POLICY "Public read access" ON games FOR SELECT USING (true);
-CREATE POLICY "Admin full access" ON games FOR ALL 
-  USING (get_organizer_role(auth.uid()) = 'ADMIN');
-
--- Public read access for teams
-CREATE POLICY "Public read access" ON teams FOR SELECT USING (true);
-CREATE POLICY "Admin full access" ON teams FOR ALL 
-  USING (get_organizer_role(auth.uid()) = 'ADMIN');
-
--- Public read access for matches
-CREATE POLICY "Public read access" ON matches FOR SELECT USING (true);
-CREATE POLICY "Admin full access" ON matches FOR ALL 
-  USING (get_organizer_role(auth.uid()) = 'ADMIN');
-
--- Managers can update their assigned game matches
-CREATE POLICY "Manager update assigned matches" ON matches FOR UPDATE
-  USING (
-    game_id IN (
-      SELECT id FROM games WHERE organizer_id IN (
-        SELECT id FROM organizers WHERE auth_id::uuid = auth.uid()
-      )
-    )
-  );
-
--- Public read access for match_participants
-CREATE POLICY "Public read access" ON match_participants FOR SELECT USING (true);
-CREATE POLICY "Admin full access" ON match_participants FOR ALL 
-  USING (get_organizer_role(auth.uid()) = 'ADMIN');
-
--- Managers can update participants for their assigned game matches
-CREATE POLICY "Manager update participants" ON match_participants FOR ALL
-  USING (
-    match_id IN (
-      SELECT m.id FROM matches m
-      JOIN games g ON m.game_id = g.id
-      JOIN organizers o ON g.organizer_id = o.id
-      WHERE o.auth_id::uuid = auth.uid()
-    )
-  );
-
--- Organizers table policies
-CREATE POLICY "Organizers can read all" ON organizers FOR SELECT USING (true);
-CREATE POLICY "Admin full access" ON organizers FOR ALL 
-  USING (get_organizer_role(auth.uid()) = 'ADMIN');
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="max-w-md w-full bg-gray-800 p-8 rounded-lg">
+        <h1 className="text-2xl font-bold text-white mb-6">
+          Samriddhi Sports Week Login
+        </h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm text-gray-300 mb-2">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-300 mb-2">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white"
+              required
+            />
+          </div>
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          >
+            Login
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
 ```
 
 ---
@@ -713,36 +1380,35 @@ Create `frontend/app/manager/layout.tsx`:
 
 ```typescript
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import Link from 'next/link'
 
 export default async function ManagerLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const session = await getServerSession(authOptions)
 
-  if (!user) {
+  if (!session) {
     redirect('/login')
   }
 
-  const organizer = await prisma.organizer.findUnique({
-    where: { authId: user.id },
-  })
-
-  if (!organizer) {
-    redirect('/')
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-gray-900 text-white">
+      <nav className="bg-gray-800 shadow-lg border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <span className="text-xl font-bold">🎮 Manager Panel</span>
+              <span className="text-xl font-bold text-green-400">
+                🎮 Manager Panel - {session.user.name}
+              </span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/" className="text-gray-300 hover:text-white">
+                Public View
+              </Link>
             </div>
           </div>
         </div>
@@ -786,55 +1452,83 @@ frontend/app/
 ```
 
 ### Step 5.2: Implement Supabase Realtime
+API Polling for Live Updates
 
-Create `frontend/lib/hooks/use-realtime-matches.ts`:
+Create `frontend/lib/hooks/use-polling-matches.ts`:
 
 ```typescript
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import type { Match } from '@prisma/client'
 
-export function useRealtimeMatches(initialMatches: Match[]) {
+export function usePollingMatches(initialMatches: Match[], interval = 5000) {
   const [matches, setMatches] = useState(initialMatches)
-  const supabase = createClient()
 
   useEffect(() => {
-    const channel = supabase
-      .channel('matches-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'matches',
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setMatches((prev) => [...prev, payload.new as Match])
-          } else if (payload.eventType === 'UPDATE') {
-            setMatches((prev) =>
-              prev.map((match) =>
-                match.id === payload.new.id ? (payload.new as Match) : match
-              )
-            )
-          } else if (payload.eventType === 'DELETE') {
-            setMatches((prev) =>
-              prev.filter((match) => match.id !== payload.old.id)
-            )
-          }
+    const fetchMatches = async () => {
+      try {
+        const response = await fetch('/api/matches')
+        if (response.ok) {
+          const data = await response.json()
+          setMatches(data)
         }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
+      } catch (error) {
+        console.error('Failed to fetch matches:', error)
+      }
     }
-  }, [supabase])
+
+    // Poll every 5 seconds for live updates
+    const intervalId = setInterval(fetchMatches, interval)
+
+    return () => clearInterval(intervalId)
+  }, [interval])
 
   return matches
 }
+```
+
+Create API endpoint `frontend/app/api/matches/route.ts`:
+
+```typescript
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+
+export async function GET() {
+  try {
+    const matches = await prisma.match.findMany({
+      where: {
+        status: { in: ['UPCOMING', 'LIVE'] },
+      },
+      include: {
+        game: true,
+        participants: {
+          include: {
+            team: {
+              include: {
+                faculty: true,
+              },
+            },
+            player: {
+              include: {
+                faculty: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        startTime: 'asc',
+      },
+    })
+
+    return NextResponse.json(matches)
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to fetch matches' },
+      { status: 500 }
+    )
+  }
 ```
 
 ### Step 5.3: Live Status Animation
@@ -994,12 +1688,13 @@ export default function Error({
 
 - [ ] Admin can create all entities
 - [ ] Manager can update match scores
-- [ ] Public dashboard shows real-time updates
+- [ ] Public dashboard shows live updates (polling)
 - [ ] Faculty points update correctly
-- [ ] RLS policies work (test with different users)
+- [ ] NextAuth authentication working
 - [ ] Mobile responsive on all pages
 - [ ] Forms validate properly
 - [ ] Error states display correctly
+- [ ] API endpoints returning correct data
 
 ---
 
@@ -1011,23 +1706,29 @@ export default function Error({
 cd frontend
 
 # Build the app
-bun run build
+bun run build (Production PostgreSQL connection string)
+- `DIRECT_URL` (Same as DATABASE_URL for production)
+- `NEXTAUTH_URL` (https://your-domain.vercel.app)
+- `NEXTAUTH_SECRET` (Generate with: `openssl rand -base64 32`)
+- `JWT_SECRET` (Generate with: `openssl rand -base64 32`)
 
-# Test production build locally
-bun run start
-```
+### Step 8.4: Setup Production Database
 
-### Step 8.2: Deploy to Vercel
+**Option 1:** Deploy PostgreSQL on a VPS/cloud provider
+**Option 2:** Use managed PostgreSQL (Railway, Supabase PostgreSQL only, Neon)
+**Option 3:** Use Vercel Postgres
+
+**Recommended:** Railway or Neon (free tiers available)
+
+### Step 8.5: Database Migration to Production
 
 ```bash
-# Install Vercel CLI
-bun add -g vercel
+# Generate migration from current schema
+bunx prisma migrate dev --name init
 
-# Login
-vercel login
-
-# Deploy
-vercel
+# Deploy to production
+bunx prisma migrate deploy
+```
 
 # Follow prompts:
 # - Link to existing project or create new
@@ -1082,29 +1783,31 @@ bunx prisma db push --force-reset
 ### Database Management
 
 ```bash
-# Create migration
-bunx prisma migrate dev --name init
+# Create miNextAuth Not Working
+- Check `.env` has `NEXTAUTH_SECRET`
+- Verify `NEXTAUTH_URL` matches your domain
+- Check middleware configuration
+- Ensure password is hashed with bcrypt
 
-# Deploy migrations
-bunx prisma migrate deploy
+### Issue: Database Connection Failed
+- Verify Docker container is running: `docker ps | grep sports-week-db`
+- Check PostgreSQL connection: `docker logs sports-week-db`
+- Restart container: `cd backend && docker compose restart`
 
-# Seed database
-bunx prisma db seed
-```
-
-### Debugging
-
-```bash
-# Check Bun version
+### Issue: Polling Not Updating
+- Check API endpoint is returning data: `/api/matches`
+- Verify polling interval in hook
+- Check browser console for error
 bun --version
 
 # Clear cache
 rm -rf .next
 bun run build
 
-# Check database connection
-bunx prisma db pull
-```
+# CNextAuth.js Docs](https://next-auth.js.org/)
+- [Shadcn/UI Components](https://ui.shadcn.com)
+- [Bun Documentation](https://bun.sh/docs)
+- [Docker Documentation](https://docs.docker.com/
 
 ---
 
@@ -1141,31 +1844,3 @@ bunx prisma generate --force
 - [Bun Documentation](https://bun.sh/docs)
 
 ---
-
-## ✅ Final Checklist
-
-Before going live:
-
-- [ ] All environment variables set
-- [ ] RLS policies enabled and tested
-- [ ] Email auth configured
-- [ ] Admin user created
-- [ ] Sample data seeded
-- [ ] Mobile responsiveness tested
-- [ ] Real-time updates working
-- [ ] Points calculation verified
-- [ ] Error handling in place
-- [ ] Production build successful
-- [ ] Vercel deployment complete
-- [ ] Custom domain configured (optional)
-
----
-
-**Last Updated:** January 22, 2026  
-**Version:** 1.0  
-**Runtime:** Bun  
-**Framework:** Next.js 15
-
----
-
-*Good luck with your Sports Week Management Tool! 🏆*
