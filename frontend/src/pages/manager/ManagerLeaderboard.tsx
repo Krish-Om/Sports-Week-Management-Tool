@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSocket } from '../../contexts/SocketContext';
-import { Loader, Trophy, TrendingUp } from 'lucide-react';
+import { Loader, Trophy } from 'lucide-react';
 import api from '../../config/api';
 
 interface Faculty {

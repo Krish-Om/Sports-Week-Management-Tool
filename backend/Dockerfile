@@ -1,13 +1,13 @@
-# Build and run stage
+# Single stage build with Bun runtime
 FROM oven/bun:latest
 
 WORKDIR /app
 
 # Copy package files
-COPY package.json bun.lock ./
+COPY package.json bun.lock* ./
 
 # Install dependencies
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Copy source code
 COPY . .
@@ -17,7 +17,7 @@ EXPOSE 3001
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:3001/api/health || exit 1
+  CMD bun -e "fetch('http://localhost:3001/api/health').then(() => process.exit(0)).catch(() => process.exit(1))" || exit 1
 
 # Start the application
 CMD ["bun", "start"]

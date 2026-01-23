@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useSocket } from '../../contexts/SocketContext'
 import { useToast } from '../../contexts/ToastContext'
-import { Trophy, Users, Calendar, Wifi, WifiOff, TrendingUp } from 'lucide-react'
+import { Trophy, Users, Calendar, Wifi, WifiOff } from 'lucide-react'
 import { api } from '../../config/api'
 import { StatsSkeleton, LeaderboardSkeleton } from '../../components/Skeleton'
-import { AnimatedCard, AnimatedList, AnimatedListItem, PageTransition } from '../../components/animations'
+import { AnimatedCard, PageTransition } from '../../components/animations'
 
 interface Faculty {
   id: string

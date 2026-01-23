@@ -50,7 +50,7 @@ export const AnimatedButton = React.forwardRef<
         whileHover={{ scale: disabled ? 1 : 1.02 }}
         whileTap={{ scale: disabled ? 1 : 0.98 }}
         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-        {...props}
+        {...(Object.fromEntries(Object.entries(props).filter(([key]) => !key.startsWith('on'))) as any)}
       >
         {isLoading ? (
           <>

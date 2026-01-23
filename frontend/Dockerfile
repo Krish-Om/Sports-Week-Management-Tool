@@ -4,10 +4,10 @@ FROM oven/bun:latest as builder
 WORKDIR /app
 
 # Copy package files
-COPY package.json bun.lock ./
+COPY package.json bun.lock* ./
 
 # Install dependencies
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Copy source code
 COPY . .
@@ -15,13 +15,13 @@ COPY . .
 # Build the application
 RUN bun run build
 
-# Production stage
-FROM node:22-alpine
+# Production stage - use Bun runtime
+FROM oven/bun:latest
 
 WORKDIR /app
 
-# Install serve to run the application
-RUN npm install -g serve
+# Install serve using bun
+RUN bun add -g serve
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
@@ -31,7 +31,7 @@ EXPOSE 5173
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:5173 || exit 1
+  CMD bun -e "fetch('http://localhost:5173').then(() => process.exit(0)).catch(() => process.exit(1))" || exit 1
 
 # Start the application
-CMD ["serve", "-s", "dist", "-l", "5173"]
+CMD ["bunx", "serve", "-s", "dist", "-l", "5173"]
