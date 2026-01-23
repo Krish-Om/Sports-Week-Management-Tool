@@ -1,5 +1,5 @@
-import { ReactNode, useEffect, useState } from 'react';
-import type React from 'react';
+import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
 interface AsyncBoundaryProps {
