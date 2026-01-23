@@ -221,7 +221,7 @@ export default function FacultiesPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-colors disabled:opacity-50 shadow-md"
                   disabled={submitting}
                 >
                   {submitting ? 'Saving...' : editingFaculty ? 'Update' : 'Create'}
