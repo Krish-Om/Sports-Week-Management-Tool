@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSocket } from '../../contexts/SocketContext';
+import { useToast } from '../../contexts/ToastContext';
 import { Loader, AlertCircle, Trophy } from 'lucide-react';
 import api from '../../config/api';
+import { MatchCardSkeleton, LeaderboardSkeleton } from '../../components/Skeleton';
 
 interface Game {
   id: string;
@@ -42,10 +44,13 @@ interface Faculty {
 export default function ManagerDashboard() {
   const { user } = useAuth();
   const { socket } = useSocket();
+  const { error: errorToast } = useToast();
   const [assignedGames, setAssignedGames] = useState<Game[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [leaderboard, setLeaderboard] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
+  const [matchesLoading, setMatchesLoading] = useState(false);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedGameId, setSelectedGameId] = useState<string>('');
   const [leaderboardRefresh, setLeaderboardRefresh] = useState(0);
@@ -108,7 +113,9 @@ export default function ManagerDashboard() {
       }
       setError('');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to fetch assigned games');
+      const errorMsg = err.response?.data?.error || 'Failed to fetch assigned games';
+      setError(errorMsg);
+      errorToast(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -116,6 +123,7 @@ export default function ManagerDashboard() {
 
   const fetchMatches = async (gameId: string) => {
     try {
+      setMatchesLoading(true);
       const response = await api.get('/matches');
       const allMatches = response.data.data;
 
@@ -150,17 +158,23 @@ export default function ManagerDashboard() {
       setMatches(sortedMatches);
     } catch (err: any) {
       console.error('Failed to fetch matches:', err);
+      errorToast('Failed to load matches');
+    } finally {
+      setMatchesLoading(false);
     }
   };
 
   const fetchLeaderboard = async () => {
     try {
+      setLeaderboardLoading(true);
       const response = await api.get('/points/leaderboard');
       const leaderboardData = Array.isArray(response.data) ? response.data : response.data.data || [];
       setLeaderboard(leaderboardData);
     } catch (err) {
       console.error('Failed to fetch leaderboard:', err);
       setLeaderboard([]);
+    } finally {
+      setLeaderboardLoading(false);
     }
   };
 
@@ -244,7 +258,13 @@ export default function ManagerDashboard() {
                 Matches for {assignedGames.find((g) => g.id === selectedGameId)?.name}
               </h2>
 
-              {matches.length === 0 ? (
+              {matchesLoading ? (
+                <div className="space-y-4">
+                  {Array.from({ length: 3 }).map((_, idx) => (
+                    <MatchCardSkeleton key={idx} />
+                  ))}
+                </div>
+              ) : matches.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500">No matches found for this game</p>
                 </div>
@@ -282,7 +302,9 @@ export default function ManagerDashboard() {
                 </button>
               </div>
 
-              {leaderboard && leaderboard.length === 0 ? (
+              {leaderboardLoading ? (
+                <LeaderboardSkeleton />
+              ) : leaderboard && leaderboard.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500 text-sm">No scores yet</p>
                 </div>
