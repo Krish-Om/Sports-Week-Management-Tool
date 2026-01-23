@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { FacultyService } from '../services/faculty.service';
+import { PointsService } from '../services/points.service';
 import { asyncHandler } from '../middleware/error';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 import type { ApiResponse } from '../types/api';
@@ -64,6 +65,18 @@ router.delete('/:id', authenticateToken, requireAdmin, asyncHandler(async (req, 
   const response: ApiResponse = {
     success: true,
     message: 'Faculty deleted successfully',
+  };
+  
+  res.json(response);
+}));
+
+// Get leaderboard (public)
+router.get('/leaderboard/all', asyncHandler(async (req, res) => {
+  const leaderboard = await PointsService.getLeaderboard();
+  
+  const response: ApiResponse<Faculty[]> = {
+    success: true,
+    data: leaderboard,
   };
   
   res.json(response);

@@ -215,8 +215,12 @@ router.put('/:id', authenticateToken, asyncHandler(async (req: Request, res: Res
   // If match is now FINISHED, calculate and apply points
   if (status === 'FINISHED' && existingMatch.status !== 'FINISHED') {
     try {
+      console.log(`📊 Attempting to calculate points for match ${req.params.id}...`);
+      console.log(`🏆 Match winner ID: ${updateData.winnerId || match.winnerId}`);
+      
       const calculation = await PointsService.calculateMatchPoints(req.params.id);
       if (calculation) {
+        console.log(`📈 Calculation successful: ${calculation.winnerFacultyName} gets ${calculation.pointsAwarded} points`);
         await PointsService.applyPoints(calculation);
 
         // Emit Socket.io event for leaderboard update
@@ -232,9 +236,12 @@ router.put('/:id', authenticateToken, asyncHandler(async (req: Request, res: Res
         console.log(
           `✅ Points applied for match ${req.params.id}: ${calculation.winnerFacultyName} +${calculation.pointsAwarded}`
         );
+      } else {
+        console.warn(`⚠️ Point calculation returned null for match ${req.params.id}`);
       }
     } catch (error: any) {
-      console.error('Failed to apply points for finished match:', error);
+      console.error(`❌ Failed to apply points for finished match ${req.params.id}:`, error.message);
+      console.error('Stack:', error.stack);
       // Don't fail the request, just log the error
     }
   }
