@@ -153,36 +153,13 @@ export const AnimatedListItem: React.FC<AnimatedListItemProps> = ({ children, cl
 };
 
 /**
- * Page Transition Wrapper
+ * Export animation components
  */
-interface PageTransitionProps {
-  children: React.ReactNode;
-  variant?: 'fadeIn' | 'slideInLeft' | 'slideInRight' | 'slideInBottom' | 'scaleIn';
-}
-
-export const PageTransition: React.FC<PageTransitionProps> = ({
-  children,
-  variant = 'fadeIn',
-}) => {
-  const variants = {
-    fadeIn,
-    slideInLeft,
-    slideInRight,
-    slideInBottom,
-    scaleIn,
-  };
-
-  return (
-    <motion.div
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      variants={variants[variant]}
-    >
-      {children}
-    </motion.div>
-  );
-};
+export { PageTransition } from './PageTransition';
+export { CardTransition } from './CardTransition';
+export { StaggerContainer } from './StaggerContainer';
+export { ListItemAnimation } from './ListItemAnimation';
+export { ScaleAnimation } from './ScaleAnimation';
 
 /**
  * Hover Scale Animation Wrapper
