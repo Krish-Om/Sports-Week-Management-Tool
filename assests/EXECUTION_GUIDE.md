@@ -217,6 +217,14 @@
 - Commit d92f33b: Backend service layer (PointsService, API routes)
 - Commit e43d5e3: System integration (match completion, Socket.io events)
 - Commit 3248c1c: Frontend updates (PublicLeaderboard UI)
+- Commit 2e9bfa6: Fix automatic points application when match FINISHED
+- Commit f516553: Add faculty leaderboard to AdminDashboard
+
+**Phase 8 Bugfix Summary:**
+- Fixed: Points weren't being automatically applied when match marked FINISHED
+- Solution: Enhanced match update route to trigger PointsService.calculateMatchPoints() and applyPoints()
+- Added: Faculty leaderboard display in AdminDashboard with real-time updates
+- Result: Points now update across all dashboards (Admin, Public, Manager) when match completes
 
 ### 🎨 Phase 9: UI Polish & Testing (Day 5 - NEXT)
 - [ ] Add loading states and animations
