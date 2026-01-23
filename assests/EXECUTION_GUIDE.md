@@ -87,39 +87,43 @@
 - [x] Fix Tailwind CSS v4 configuration issues
 - [x] Fix import path issues in frontend components
 
-### 👨‍💼 Phase 5: Admin Dashboard CRUD Operations (Day 3 - 8 hours)
+### ✅ Phase 5: Admin Dashboard CRUD Operations (COMPLETED)
 - [x] Create admin layout with navigation (completed in Phase 3)
-- [ ] Build CRUD operations for Faculties
-  - [ ] Create FacultyService backend methods (already exists, need to verify)
-  - [ ] Build faculty API routes (already exists, need to verify)
-  - [ ] Create FacultiesPage component with table and modal
-  - [ ] Test faculty CRUD operations
-- [ ] Build CRUD operations for Games
-  - [ ] Create GameService backend methods
-  - [ ] Build game API routes
-  - [ ] Create GamesPage component with form
-  - [ ] Add game type selection (TEAM/INDIVIDUAL)
-  - [ ] Add manager assignment dropdown
-  - [ ] Test game CRUD operations
-- [ ] Build CRUD operations for Teams
-  - [ ] Create TeamService backend methods
-  - [ ] Build team API routes
-  - [ ] Create TeamsPage component
-  - [ ] Add faculty and game relationship selectors
-  - [ ] Test team CRUD operations
-- [ ] Build CRUD operations for Players
-  - [ ] Create PlayerService backend methods
-  - [ ] Build player API routes
-  - [ ] Create PlayersPage component
-  - [ ] Add faculty assignment and semester fields
-  - [ ] Test player CRUD operations
-- [ ] Build CRUD operations for Matches
-  - [ ] Create MatchService backend methods
-  - [ ] Build match API routes
-  - [ ] Create MatchesPage component
-  - [ ] Add participant assignment (teams or players)
-  - [ ] Add venue, start time, and status fields
-  - [ ] Test match CRUD operations
+- [x] Build CRUD operations for Faculties
+  - [x] Create FacultyService backend methods (pre-existing, verified)
+  - [x] Build faculty API routes (pre-existing, verified)
+  - [x] Create FacultiesPage component with table and modal
+  - [x] Test faculty CRUD operations
+- [x] Build CRUD operations for Games
+  - [x] Create GameService backend methods
+  - [x] Build game API routes with validation
+  - [x] Create GamesPage component with form
+  - [x] Add game type selection (TEAM/INDIVIDUAL)
+  - [x] Add manager assignment dropdown
+  - [x] Test game CRUD operations
+- [x] Build CRUD operations for Teams
+  - [x] Create TeamService backend methods with duplicate checking
+  - [x] Build team API routes with relationship validation
+  - [x] Create TeamsPage component
+  - [x] Add faculty and game relationship selectors
+  - [x] Test team CRUD operations
+- [x] Build CRUD operations for Players
+  - [x] Create PlayerService backend methods
+  - [x] Build player API routes with faculty validation
+  - [x] Create PlayersPage component
+  - [x] Add faculty assignment and semester fields
+  - [x] Test player CRUD operations
+- [x] Build CRUD operations for Matches
+  - [x] Create MatchService backend methods with participant management
+  - [x] Build match API routes with participant validation
+  - [x] Create MatchesPage component with card layout
+  - [x] Add participant assignment (teams or players based on game type)
+  - [x] Add venue, datetime picker, and status fields
+  - [x] Test match CRUD operations
+- [x] All routes mounted in backend/src/routes/index.ts
+- [x] All pages integrated in frontend/src/App.tsx
+- [x] Authentication fixed (response.data.data extraction)
+- [x] Socket.io connection verified
 
 ### 🎮 Phase 6: Manager Dashboard (Day 3 - 6 hours)
 - [ ] Create manager-specific layout
