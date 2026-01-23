@@ -30,7 +30,7 @@ export const AnimatedButton = React.forwardRef<
     const baseStyles = 'font-semibold rounded-lg transition-colors flex items-center gap-2 justify-center';
     
     const variantStyles = {
-      primary: 'bg-blue-600 hover:bg-blue-700 text-white disabled:bg-blue-400',
+      primary: 'bg-blue-800 hover:bg-blue-900 text-white disabled:bg-blue-600 shadow-md',
       secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-900 disabled:bg-gray-100',
       danger: 'bg-red-600 hover:bg-red-700 text-white disabled:bg-red-400',
       success: 'bg-green-600 hover:bg-green-700 text-white disabled:bg-green-400',

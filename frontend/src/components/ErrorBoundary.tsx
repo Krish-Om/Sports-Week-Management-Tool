@@ -82,7 +82,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 <div className="flex gap-3 flex-col sm:flex-row">
                   <button
                     onClick={this.resetError}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
+                    className="flex-1 bg-blue-800 hover:bg-blue-900 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-md"
                   >
                     <RefreshCw className="w-4 h-4" />
                     Try Again
