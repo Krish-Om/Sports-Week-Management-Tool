@@ -5,42 +5,179 @@
 **Organizer:** 5th Semester CSIT Students  
 **Faculties:** CSIT, BCA, BSW, BBS  
 
-**Tech Stack:**
+**Tech Stack (Per AI_CONTEXT.prompt.txt - HIGHEST PRIORITY):**
 - **Runtime:** Bun (v1.0+)  
-- **Framework:** Next.js 15 (App Router)  
-- **Database:** PostgreSQL (Docker - Local)  
-- **ORM:** Prisma  
-- **Auth:** NextAuth.js (Credentials Provider)  
-- **UI:** Tailwind CSS + Shadcn/UI + Lucide Icons  
-- **Real-time:** API Polling (No Supabase)  
+- **Frontend:** React (Vite) + Tailwind CSS + Lucide-React Icons  
+- **Backend:** Express.js (running on Bun)  
+- **Database:** PostgreSQL (Docker - Local on port 5433)  
+- **ORM:** Prisma (Source of Truth for Schema)  
+- **Real-time:** Socket.io (Bi-directional updates)  
+- **Auth:** Simple JWT with Pre-seeded Accounts (No Public Registration)  
+- **Tunneling:** Cloudflare Tunnel (Home server to Web)
+
+**Authentication Strategy for Small Private Event:**
+- ✅ **No Self-Registration:** Admin pre-creates all user accounts
+- ✅ **Username/Password Login:** Simple credentials (e.g., "futsal_manager", "chess_manager")
+- ✅ **JWT Tokens:** Stateless authentication with 7-day expiry
+- ✅ **Role-Based Access:** Only ADMIN and MANAGER roles
+- ✅ **Manual User Management:** Admin can add/remove managers via dashboard
+- ❌ **No Email Verification:** Not needed for known college organizers
+- ❌ **No Password Reset Flow:** Admin can manually reset in database
+- ❌ **No OAuth/Social Login:** Unnecessary complexity for 3-day event  
 
 **Target Timeline:** 4-5 Days  
-**Last Updated:** January 22, 2026
+**Last Updated:** January 23, 2026
 
 ---
 
-## 📊 System Architecture
+## 📝 PROJECT TODO LIST (Based on AI_CONTEXT.prompt.txt)
+
+### ✅ Phase 0: Infrastructure Setup (COMPLETED)
+- [x] PostgreSQL Docker container running (port 5433)
+- [x] Database ERD designed (7 entities)
+- [x] Project documentation created
+
+### 🎯 Phase 1: Backend Foundation (Day 1 - 4 hours)
+- [ ] Initialize Express server with Bun runtime in `/backend`
+- [ ] Setup Prisma with PostgreSQL connection (port 5433)
+- [ ] Create complete Prisma schema from ERD (Faculty, Player, Game, Team, Match, MatchParticipant, User)
+- [ ] Push schema to database and verify
+- [ ] Create seed script with initial data (4 faculties, admin user)
+- [ ] Setup JWT authentication middleware
+- [ ] Create basic Express API structure
+
+### 🔌 Phase 2: Real-time Socket.io Integration (Day 1 - 2 hours)
+- [ ] Install and configure Socket.io on Express server
+- [ ] Create Socket.io event handlers (scoreUpdate, matchStatusChange)
+- [ ] Implement reconnection logic on server
+- [ ] Test bi-directional communication
+
+### 🎨 Phase 3: Frontend React Setup (Day 1-2 - 3 hours)
+- [ ] Initialize React with Vite in `/frontend`
+- [ ] Install dependencies (Tailwind CSS, Lucide-React, Socket.io-client, framer-motion)
+- [ ] Configure Tailwind with athletic theme (#2563eb Blue, #f97316 Orange)
+- [ ] Setup React Router for navigation
+- [ ] Create Socket.io client connection with reconnection handling
+- [ ] Implement "Connection Lost" banner component
+
+### 🔐 Phase 4: Authentication System (Day 2 - 3 hours)
+- [ ] Create JWT-based login API endpoint
+- [ ] Implement password hashing (bcrypt)
+- [ ] Build simple login page with username/password
+- [ ] Create protected route HOC/wrapper
+- [ ] Setup role-based access control (ADMIN, MANAGER)
+- [ ] Admin dashboard: User management (create/delete managers)
+- [ ] Seed script: Create initial admin + sample managers
+
+### 👨‍💼 Phase 5: Admin Dashboard (Day 2 - 8 hours)
+- [ ] Create admin layout with navigation
+- [ ] Build CRUD operations for Faculties
+- [ ] Build CRUD operations for Games
+- [ ] Build CRUD operations for Teams
+- [ ] Build CRUD operations for Players
+- [ ] Build CRUD operations for Users (organizers)
+- [ ] Build CRUD operations for Matches
+- [ ] Connect all forms to Express API endpoints
+
+### 🎮 Phase 6: Manager Dashboard (Day 3 - 6 hours)
+- [ ] Create manager-specific layout
+- [ ] Display assigned games list
+- [ ] Build match management interface
+- [ ] Implement live score update UI
+- [ ] Add status toggle (UPCOMING → LIVE → FINISHED)
+- [ ] Emit Socket.io events on score updates
+- [ ] Mobile-first responsive design
+
+### 🌍 Phase 7: Public Dashboard (Day 4 - 6 hours)
+- [ ] Create homepage with featured matches
+- [ ] Build fixtures listing page with filters
+- [ ] Implement live matches page with Socket.io listeners
+- [ ] Create completed matches/results page
+- [ ] Build faculty leaderboard page (real-time updates)
+- [ ] Add game-specific views
+- [ ] Implement bottom navigation bar for mobile
+- [ ] Add framer-motion pulse animations for live score changes
+
+### 📊 Phase 8: Points Calculation Logic (Day 5 - 3 hours)
+- [ ] Create automatic points calculation API endpoint
+- [ ] Implement points distribution based on game weight
+- [ ] Update Faculty.totalPoints when match finishes
+- [ ] Emit Socket.io event for leaderboard updates
+- [ ] Add points history tracking (optional)
+
+### 🎨 Phase 9: UI Polish & Testing (Day 5 - 3 hours)
+- [ ] Add loading states and animations
+- [ ] Implement error boundaries and error handling
+- [ ] Create toast notifications
+- [ ] Add framer-motion animations
+- [ ] Test all CRUD operations
+- [ ] Verify Socket.io real-time updates
+- [ ] Test role-based access control
+- [ ] Mobile responsiveness testing
+- [ ] Cross-browser testing
+
+### 🚀 Phase 10: Deployment Setup (Day 5 - 2 hours)
+- [ ] Setup Cloudflare Tunnel for backend
+- [ ] Configure production environment variables
+- [ ] Build frontend for production
+- [ ] Setup production PostgreSQL (or keep local)
+- [ ] Configure CORS for production domains
+- [ ] Test production deployment
+- [ ] Setup monitoring/logging
+
+---
+
+## 🎯 CRITICAL IMPLEMENTATION RULES (From AI_CONTEXT.prompt.txt)
+
+1. **Type Safety:** Always refer to `schema.prisma` before generating API routes
+2. **No Over-Engineering:** Use local React state (useState/useEffect) + Socket.io
+3. **Real-time First:** All score updates MUST emit Socket.io events immediately
+4. **Mobile First:** Bottom navigation, thumb-friendly UI
+5. **Reconnectivity:** Frontend MUST show "Connection Lost" banner on socket disconnect
+6. **Role-Based Access:**
+   - ADMIN: Full control (Games, Faculties, Users, all CRUD operations)
+   - MANAGER: Can only update scores/status for their assigned Game
+7. **Authentication for Private Event:**
+   - No public registration or signup page
+   - Admin pre-creates all manager accounts with simple credentials
+   - Example: `username: "futsal_manager"`, `password: "futsal2026"`
+   - Managers get credentials verbally/via WhatsApp from admin
+   - Simple login page with username/password only
+
+---
+
+## 📊 System Architecture (Per AI_CONTEXT.prompt.txt)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Public Dashboard                          │
+│              Public Dashboard (React + Vite)                 │
 │     (Live Fixtures, Faculty Leaderboard, Results)           │
-│                  (API Polling for Updates)                   │
+│              Socket.io Client (Real-time Updates)            │
 └──────────────────┬──────────────────────────────────────────┘
-                   │ HTTP Polling
+                   │ Socket.io (Bi-directional)
+                   ├─ scoreUpdate events
+                   ├─ matchStatusChange events
+                   └─ leaderboardUpdate events
+                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│         Express Backend (Bun Runtime)                        │
+│  ┌────────────────┬───────────────┬──────────────────┐     │
+│  │ REST API       │ Socket.io     │ JWT Auth         │     │
+│  │ Endpoints      │ Server        │ Middleware       │     │
+│  └────────────────┴───────────────┴──────────────────┘     │
+│                    Prisma ORM                                │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
                    ▼
          ┌─────────────────────┐
-         │  PostgreSQL         │◄────────┐
-         │  (Docker Local)     │         │
-         └─────────────────────┘         │
-                   ▲                     │
-                   │ Prisma ORM          │ Server Actions
-                   │                     │
-┌──────────────────┴─────────────────────┴─────────────────────┐
-│              Next.js 15 App Router (Bun Runtime)             │
-├──────────────────────────────────────────────────────────────┤
-│  Admin (CSIT 5th) │  Manager Dashboard  │  NextAuth.js      │
-└──────────────────────────────────────────────────────────────┘
+         │  PostgreSQL         │
+         │  (Docker: 5433)     │
+         └─────────────────────┘
+                   
+┌─────────────────────────────────────────────────────────────┐
+│                    Cloudflare Tunnel                         │
+│              (Home Server to Public Web)                     │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -67,15 +204,31 @@ git --version
 
 - [ ] Bun v1.0+ installed
 - [ ] Docker & Docker Compose installed
-- [ ] Code editor ready (VS Code recommended)de recommended)
-- [ ] Supabase account created
-- [ ] Domain model understood (see entity-relation.mermaid)
+- [ ] Code editor ready (VS Code recommended)
+- [ ] Domain model understood (see DatabaseEntityDiagram.mermaid)
 
 ---
 
-## 🗄️ Phase 1: Database Architecture (Day 1 - 4 hours)
+## 🗄️ Phase 1: Backend & Database Setup (Day 1 - 4 hours)
 
-### Step 1.1: Setup Local PostgreSQL with Docker
+### Step 1.1: Initialize Backend with Bun
+
+```bash
+# Navigate to backend folder
+cd backend
+
+# Initialize Bun project
+bun init -y
+
+# Install core dependencies
+bun add express prisma @prisma/client socket.io cors dotenv jsonwebtoken bcryptjs
+bun add -d @types/express @types/cors @types/jsonwebtoken @types/bcryptjs typescript @types/node
+
+# Create basic folder structure
+mkdir -p src/routes src/controllers src/middleware src/config
+```
+
+### Step 1.2: Setup Local PostgreSQL with Docker
 
 Create `backend/docker-compose.yml`:
 
@@ -87,10 +240,11 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: sports_week
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
+      POSTGRES_USER: sports
+      POSTGRES_PASSWORD: sports123
+      POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -104,90 +258,464 @@ cd backend
 docker compose up -d
 ```
 
-### Step 1.2: Verify Database Connection
+### Step 1.3: Verify Database Connection
 
 ```bash
 # Check if container is running
 docker ps | grep sports-week-db
 
-# Should see: sports-week-db running on port 5432
+# Should see: sports-week-db running on port 5433
 ```
 
-cd frontend
+### Step 1.4: Setup Prisma Schema
 
-# Core dependencies
-bun add @prisma/client next-auth@beta bcryptjs
-bun add -d prisma @types/bcryptjs
+Create `backend/prisma/schema.prisma`:
 
-# UI Components
-bunx shadcn-ui@latest init
+### Step 1.4: Setup Prisma Schema
 
-# Select options:
-# - Style: Default
-# - Base color: Slate (or choose based on "Sports vibe")
-  --no-src-dir \
-  --import-alias "@/*"
+Create `backend/prisma/schema.prisma`:
 
-cd frontend
-```
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-### Step 1.4: Install Dependencies
+generator client {
+  provider = "prisma-client-js"
+}
 
-```bash
-# Core dependencies
-bun add @supabase/supabase-js @supabase/ssr
-bun add @prisma/client
-bun add -d prisma
+// Enums
+enum Role {
+  ADMIN
+  MANAGER
+}
 
-# UI Components
-bunx shadcn-ui@latest init
+enum MatchStatus {
+  UPCOMING
+  LIVE
+  FINISHED
+}
 
-# Select options:
-# - Style: Default`:
+enum GameType {
+  TEAM
+  INDIVIDUAL
+}
 
-```env
-# Database (Local PostgreSQL)
-DATABASE_URL="postgresql://postgres:postgres123@localhost:5432/sports_week"
-DIRECT_URL="postgresql://postgres:postgres123@localhost:5432/sports_week"
+// Core Models
+model Faculty {
+  id          String   @id @default(uuid())
+  name        String   @unique // "CSIT", "BCA", "BSW", "BBS"
+  totalPoints Int      @default(0) @map("total_points")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-# NextAuth Configuration
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-super-secret-nextauth-key-change-in-production-min-32-chars"
+  teams   Team[]
+  players Player[]
 
-# JWT Secret (for additional token signing if needed)
-JWT_SECRET="your-super-secret-jwt-key-change-in-production-min-32-characters"
-bunx shadcn-ui@latest add input
-bunx shadcn-ui@latest add select
-bunx shadcn-ui@latest add label
-bunx shadcn-ui@latest add toast
-bunx shadcn-ui@latest add dropdown-menu
-bunx shadcn-ui@latest add tabs
+  @@map("faculties")
+}
+
+model Player {
+  id        String   @id @default(uuid())
+  name      String
+  facultyId String   @map("faculty_id")
+  faculty   Faculty  @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  semester  String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  matchParticipants MatchParticipant[]
+
+  @@index([facultyId])
+  @@map("players")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String // Hashed password
+  role      Role     @default(MANAGER)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  games Game[]
+
+  @@map("users")
+}
+
+model Game {
+  id          String   @id @default(uuid())
+  name        String   @unique // "Futsal", "Chess", etc.
+  type        GameType
+  pointWeight Int      @default(1) @map("point_weight")
+  managerId   String?  @map("manager_id")
+  manager     User?    @relation(fields: [managerId], references: [id])
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  matches Match[]
+  teams   Team[]
+
+  @@index([managerId])
+  @@map("games")
+}
+
+model Team {
+  id        String   @id @default(uuid())
+  name      String
+  facultyId String   @map("faculty_id")
+  faculty   Faculty  @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  gameId    String   @map("game_id")
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  matchParticipants MatchParticipant[]
+
+  @@unique([facultyId, gameId, name])
+  @@index([facultyId])
+  @@index([gameId])
+  @@map("teams")
+}
+
+model Match {
+  id        String      @id @default(uuid())
+  gameId    String      @map("game_id")
+  game      Game        @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  startTime DateTime    @map("start_time")
+  venue     String
+  status    MatchStatus @default(UPCOMING)
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  participants MatchParticipant[]
+
+  @@index([gameId])
+  @@index([status])
+  @@map("matches")
+}
+
+model MatchParticipant {
+  id           String  @id @default(uuid())
+  matchId      String  @map("match_id")
+  match        Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  teamId       String? @map("team_id")
+  team         Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  playerId     String? @map("player_id")
+  player       Player? @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  score        Int     @default(0)
+  pointsEarned Int     @default(0) @map("points_earned")
+
+  @@index([matchId])
+  @@index([teamId])
+  @@index([playerId])
+  @@map("match_participants")
+}
 ```
 
 ### Step 1.5: Setup Environment Variables
 
-Create `frontend/.env.local`:
+Create `backend/.env`:
 
 ```env
 # Database
-DATABASE_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
-DIRECT_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
+DATABASE_URL="postgresql://sports:sports123@localhost:5433/sports_week"
 
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL="https://xxxxx.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGc..."
-SUPABASE_SERVICE_ROLE_KEY="eyJhbGc..." # From API settings
+# JWT Secret
+JWT_SECRET="your-super-secret-jwt-key-change-in-production-min-32-characters"
+
+# Server
+PORT=3001
+NODE_ENV=development
 ```
 
-### Step 1.6: Create Prisma Schema
+### Step 1.6: Push Schema to Database
 
-Create `frontend/prisma/schema.prisma`:
+```bash
+cd backend
 
-```prisma
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+# Initialize Prisma
+bunx prisma init
+
+# Generate Prisma Client
+bunx prisma generate
+
+# Push schema to database
+bunx prisma db push
+
+# Open Prisma Studio to verify
+bunx prisma studio
+```
+
+### Step 1.7: Create Seed Data
+
+Create `backend/prisma/seed.ts`:
+
+```typescript
+import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  console.log('🌱 Starting seed...')
+
+  // Create Faculties
+  const faculties = await Promise.all([
+    prisma.faculty.upsert({
+      where: { name: 'CSIT' },
+      update: {},
+      create: { name: 'CSIT' },
+    }),
+    prisma.faculty.upsert({
+      where: { name: 'BCA' },
+      update: {},
+      create: { name: 'BCA' },
+    }),
+    prisma.faculty.upsert({
+      where: { name: 'BSW' },
+      update: {},
+      create: { name: 'BSW' },
+    }),
+    prisma.faculty.upsert({
+      where: { name: 'BBS' },
+      update: {},
+      create: { name: 'BBS' },
+    }),
+  ])
+
+  console.log('✅ Faculties created:', faculties.length)
+
+  // Create Admin User
+  const hashedPassword = await bcrypt.hash('admin123', 10)
+  const admin = await prisma.user.upsert({
+    where: { username: 'admin' },
+    update: {},
+    create: {
+      username: 'admin',
+      password: hashedPassword,
+      role: 'ADMIN',
+    },
+  })
+
+  console.log('✅ Admin user created:', admin.username)
+  console.log('🎉 Seed completed successfully!')
+}
+
+main()
+  .catch((e) => {
+    console.error('❌ Seed failed:', e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
+```
+
+Add to `backend/package.json`:
+```json
+{
+  "scripts": {
+    "seed": "bun run prisma/seed.ts"
+  }
+}
+```
+
+Run seed:
+```bash
+bun run seed
+```
+
+---
+
+## 🔐 Phase 2: Express Server & JWT Auth (Day 1-2 - 4 hours)
+
+### Step 2.1: Create Express Server
+
+Create `backend/src/index.ts`:
+
+```typescript
+import express from 'express'
+import cors from 'cors'
+import dotenv from 'dotenv'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+
+dotenv.config()
+
+const app = express()
+const httpServer = createServer(app)
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true,
+  },
+})
+
+// Middleware
+app.use(cors())
+app.use(express.json())
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Sports Week API is running' })
+})
+
+// Socket.io connection
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id)
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id)
+  })
+})
+
+const PORT = process.env.PORT || 3001
+
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`)
+  console.log(`🔌 Socket.io ready for connections`)
+})
+
+export { io }
+```
+
+Add start script to `backend/package.json`:
+```json
+{
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts",
+    "seed": "bun run prisma/seed.ts"
+  }
+}
+```
+
+### Step 2.2: Create JWT Middleware
+
+Create `backend/src/middleware/auth.ts`:
+
+```typescript
+import { Request, Response, NextFunction } from 'express'
+import jwt from 'jsonwebtoken'
+
+export interface AuthRequest extends Request {
+  user?: {
+    id: string
+    username: string
+    role: string
+  }
+}
+
+export const authenticateToken = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' })
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET!, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid or expired token' })
+    }
+    req.user = decoded as any
+    next()
+  })
+}
+
+export const requireAdmin = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  if (req.user?.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Admin access required' })
+  }
+  next()
+}
+```
+
+### Step 2.3: Create Auth Routes
+
+Create `backend/src/routes/auth.ts`:
+
+```typescript
+import { Router } from 'express'
+import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
+
+const router = Router()
+const prisma = new PrismaClient()
+
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body
+
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password required' })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { username },
+    })
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' })
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password)
+
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Invalid credentials' })
+    }
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      },
+      process.env.JWT_SECRET!,
+      { expiresIn: '7d' }
+    )
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      },
+    })
+  } catch (error) {
+    console.error('Login error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+export default router
+```
+
+Update `backend/src/index.ts` to include auth routes:
+
+```typescript
+import authRoutes from './routes/auth'
+
+// ... existing code ...
+
+app.use('/api/auth', authRoutes)
+```
+
+---
+
+## 🎨 Phase 3: Frontend React Vite Setup (Day 2 - 3 hours)
 }
 
 generator client {
