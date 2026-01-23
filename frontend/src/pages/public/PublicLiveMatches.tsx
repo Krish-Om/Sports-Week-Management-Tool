@@ -28,17 +28,22 @@ export const PublicLiveMatches: React.FC = () => {
     if (!socket) return
 
     // Listen for real-time updates
-    socket.on('scoreUpdated', () => {
+    socket.on('scoreUpdate', () => {
       setRefreshTrigger((prev) => prev + 1)
     })
 
-    socket.on('matchStatusChanged', () => {
+    socket.on('matchStatusChange', () => {
+      setRefreshTrigger((prev) => prev + 1)
+    })
+
+    socket.on('matchWinnerSet', () => {
       setRefreshTrigger((prev) => prev + 1)
     })
 
     return () => {
-      socket.off('scoreUpdated')
-      socket.off('matchStatusChanged')
+      socket.off('scoreUpdate')
+      socket.off('matchStatusChange')
+      socket.off('matchWinnerSet')
     }
   }, [socket])
 
@@ -51,19 +56,7 @@ export const PublicLiveMatches: React.FC = () => {
       // Filter only LIVE matches
       const liveMatches = allMatches.filter((m: Match) => m.status === 'LIVE')
 
-      // Fetch detailed match info
-      const detailedMatches = await Promise.all(
-        liveMatches.map(async (match: Match) => {
-          try {
-            const detailResponse = await api.get(`/matches/${match.id}`)
-            return detailResponse.data.data
-          } catch (err) {
-            return match
-          }
-        })
-      )
-
-      setMatches(detailedMatches)
+      setMatches(liveMatches)
     } catch (err: any) {
       console.error('Failed to fetch live matches:', err)
     } finally {

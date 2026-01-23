@@ -20,33 +20,25 @@ export const PublicFixtures: React.FC = () => {
   const [matches, setMatches] = useState<Match[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null)
+  const [error, setError] = useState<string>('')
+
+  console.log('PublicFixtures component rendered')
 
   useEffect(() => {
+    console.log('PublicFixtures useEffect - fetching matches')
     fetchMatches()
   }, [])
 
   const fetchMatches = async () => {
     try {
       setLoading(true)
+      setError('')
       const response = await api.get('/matches')
       const allMatches = response.data.data || []
-      
-      // Fetch detailed match info for each match
-      const detailedMatches = await Promise.all(
-        allMatches.map(async (match: Match) => {
-          try {
-            const detailResponse = await api.get(`/matches/${match.id}`)
-            return detailResponse.data.data
-          } catch (err) {
-            console.error(`Failed to fetch details for match ${match.id}:`, err)
-            return match
-          }
-        })
-      )
-
-      setMatches(detailedMatches)
+      setMatches(allMatches)
     } catch (err: any) {
       console.error('Failed to fetch matches:', err)
+      setError(err.message || 'Failed to fetch matches')
     } finally {
       setLoading(false)
     }
@@ -112,7 +104,18 @@ export const PublicFixtures: React.FC = () => {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8">
-        {matches.length === 0 ? (
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
+        
+        {loading ? (
+          <div className="text-center py-8">
+            <Loader className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+            <p className="text-gray-600">Loading fixtures...</p>
+          </div>
+        ) : matches.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600">No matches scheduled yet</p>

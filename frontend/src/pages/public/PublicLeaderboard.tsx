@@ -28,7 +28,7 @@ export const PublicLeaderboard: React.FC = () => {
   useEffect(() => {
     if (!socket) return
 
-    socket.on('matchStatusChanged', () => {
+    socket.on('matchStatusChange', () => {
       setRefreshTrigger((prev) => prev + 1)
     })
 
@@ -37,7 +37,7 @@ export const PublicLeaderboard: React.FC = () => {
     })
 
     return () => {
-      socket.off('matchStatusChanged')
+      socket.off('matchStatusChange')
       socket.off('matchWinnerSet')
     }
   }, [socket])
@@ -54,45 +54,38 @@ export const PublicLeaderboard: React.FC = () => {
       for (const match of matches) {
         if (match.status !== 'FINISHED' || !match.participants) continue
 
-        // Fetch detailed match to get winner info
-        try {
-          const detailRes = await api.get(`/matches/${match.id}`)
-          const detailedMatch = detailRes.data.data
+        // Match already has full details from the list endpoint
+        for (const participant of match.participants || []) {
+          const key = participant.teamId || participant.playerId
+          const name = participant.team?.name || participant.player?.name || 'Unknown'
 
-          for (const participant of detailedMatch.participants || []) {
-            const key = participant.teamId || participant.playerId
-            const name = participant.team?.name || participant.player?.name || 'Unknown'
-
-            if (!statsMap.has(key)) {
-              statsMap.set(key, {
-                id: key,
-                name,
-                type: participant.teamId ? 'TEAM' : 'PLAYER',
-                wins: 0,
-                losses: 0,
-                draws: 0,
-                points: 0,
-                gamesPlayed: 0,
-              })
-            }
-
-            const entry = statsMap.get(key)!
-            entry.gamesPlayed++
-
-            if (detailedMatch.winnerId === key) {
-              entry.wins++
-              entry.points += 3
-            } else if (participant.result === 'DRAW') {
-              entry.draws++
-              entry.points += 1
-            } else if (participant.result === 'LOSS') {
-              entry.losses++
-            }
-
-            entry.points += participant.pointsEarned || 0
+          if (!statsMap.has(key)) {
+            statsMap.set(key, {
+              id: key,
+              name,
+              type: participant.teamId ? 'TEAM' : 'PLAYER',
+              wins: 0,
+              losses: 0,
+              draws: 0,
+              points: 0,
+              gamesPlayed: 0,
+            })
           }
-        } catch (err) {
-          console.error('Failed to fetch match details:', err)
+
+          const entry = statsMap.get(key)!
+          entry.gamesPlayed++
+
+          if (match.winnerId === key) {
+            entry.wins++
+            entry.points += 3
+          } else if (participant.result === 'DRAW') {
+            entry.draws++
+            entry.points += 1
+          } else if (participant.result === 'LOSS') {
+            entry.losses++
+          }
+
+          entry.points += participant.pointsEarned || 0
         }
       }
 
