@@ -203,4 +203,56 @@ export class MatchService {
       participants,
     };
   }
+
+  static async finishMatchWithPoints(
+    id: string,
+    winnerId: string | null,
+    participantUpdates?: Array<{ participantId: string; score: number; result?: string }>
+  ): Promise<any> {
+    const { PointsService } = await import('./points.service');
+
+    // Update match status to FINISHED with winner
+    await this.update(id, { 
+      status: 'FINISHED',
+      winnerId: winnerId || undefined,
+    });
+
+    // Update participant scores if provided
+    if (participantUpdates && participantUpdates.length > 0) {
+      for (const update of participantUpdates) {
+        const [participant] = await db
+          .select()
+          .from(schema.matchParticipants)
+          .where(eq(schema.matchParticipants.id, update.participantId))
+          .limit(1);
+
+        if (participant) {
+          // Set result based on whether they won
+          const participantWinnerId = participant.teamId || participant.playerId;
+          const result = winnerId === participantWinnerId ? 'WIN' : 'LOSS';
+
+          await this.updateParticipantScore(
+            update.participantId,
+            update.score,
+            0 // Points will be calculated by PointsService
+          );
+
+          // Update result
+          await db
+            .update(schema.matchParticipants)
+            .set({ result: result as any, updatedAt: new Date() })
+            .where(eq(schema.matchParticipants.id, update.participantId));
+        }
+      }
+    }
+
+    // Calculate and apply points
+    const calculation = await PointsService.calculateMatchPoints(id);
+    if (calculation) {
+      await PointsService.applyPoints(calculation);
+    }
+
+    // Return updated match with all details
+    return this.getByIdWithDetails(id);
+  }
 }

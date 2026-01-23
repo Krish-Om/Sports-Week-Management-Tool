@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSocket } from '../../contexts/SocketContext';
-import { Loader, AlertCircle } from 'lucide-react';
+import { Loader, AlertCircle, Trophy } from 'lucide-react';
 import api from '../../config/api';
 
 interface Game {
@@ -33,14 +33,22 @@ interface MatchParticipant {
   player?: { name: string; id: string };
 }
 
+interface Faculty {
+  id: string;
+  name: string;
+  totalPoints: number;
+}
+
 export default function ManagerDashboard() {
   const { user } = useAuth();
   const { socket } = useSocket();
   const [assignedGames, setAssignedGames] = useState<Game[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
+  const [leaderboard, setLeaderboard] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedGameId, setSelectedGameId] = useState<string>('');
+  const [leaderboardRefresh, setLeaderboardRefresh] = useState(0);
 
   useEffect(() => {
     fetchAssignedGames();
@@ -51,6 +59,11 @@ export default function ManagerDashboard() {
       fetchMatches(selectedGameId);
     }
   }, [selectedGameId]);
+
+  // Fetch leaderboard
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [leaderboardRefresh]);
 
   // Listen for real-time score updates via Socket.io
   useEffect(() => {
@@ -68,10 +81,15 @@ export default function ManagerDashboard() {
       fetchMatches(selectedGameId);
     });
 
+    socket.on('leaderboardUpdate', () => {
+      setLeaderboardRefresh((prev) => prev + 1);
+    });
+
     return () => {
       socket.off('scoreUpdate');
       socket.off('matchStatusChange');
       socket.off('matchWinnerSet');
+      socket.off('leaderboardUpdate');
     };
   }, [socket, selectedGameId]);
 
@@ -117,9 +135,32 @@ export default function ManagerDashboard() {
         })
       );
       
-      setMatches(detailedMatches);
+      // Sort matches: FINISHED first (descending by date), then LIVE, then UPCOMING
+      const sortedMatches = detailedMatches.sort((a: Match, b: Match) => {
+        const statusOrder = { FINISHED: 0, LIVE: 1, UPCOMING: 2 };
+        const statusDiff = (statusOrder[a.status as keyof typeof statusOrder] || 3) - 
+                           (statusOrder[b.status as keyof typeof statusOrder] || 3);
+        
+        if (statusDiff !== 0) return statusDiff;
+        
+        // Within same status, sort by date (newest first)
+        return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
+      });
+      
+      setMatches(sortedMatches);
     } catch (err: any) {
       console.error('Failed to fetch matches:', err);
+    }
+  };
+
+  const fetchLeaderboard = async () => {
+    try {
+      const response = await api.get('/points/leaderboard');
+      const leaderboardData = Array.isArray(response.data) ? response.data : response.data.data || [];
+      setLeaderboard(leaderboardData);
+    } catch (err) {
+      console.error('Failed to fetch leaderboard:', err);
+      setLeaderboard([]);
     }
   };
 
@@ -165,56 +206,138 @@ export default function ManagerDashboard() {
           </div>
         )}
 
-        {/* Game Selection */}
-        <div className="bg-white rounded-lg shadow mb-6 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">My Games</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {assignedGames.map((game) => (
-              <button
-                key={game.id}
-                onClick={() => setSelectedGameId(game.id)}
-                className={`p-4 rounded-lg border-2 transition-all ${
-                  selectedGameId === game.id
-                    ? 'border-blue-600 bg-blue-50'
-                    : 'border-gray-200 bg-white hover:border-blue-400'
-                }`}
-              >
-                <div className="text-left">
-                  <h3 className="font-semibold text-gray-900">{game.name}</h3>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Type: <span className="font-medium">{game.type}</span>
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Points Weight: <span className="font-medium">{game.pointWeight}x</span>
-                  </p>
+        {/* Two-Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content - Left/Top */}
+          <div className="lg:col-span-2">
+            {/* Game Selection */}
+            <div className="bg-white rounded-lg shadow mb-6 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">My Games</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {assignedGames.map((game) => (
+                  <button
+                    key={game.id}
+                    onClick={() => setSelectedGameId(game.id)}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      selectedGameId === game.id
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-gray-200 bg-white hover:border-blue-400'
+                    }`}
+                  >
+                    <div className="text-left">
+                      <h3 className="font-semibold text-gray-900">{game.name}</h3>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Type: <span className="font-medium">{game.type}</span>
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Points Weight: <span className="font-medium">{game.pointWeight}x</span>
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Matches List */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Matches for {assignedGames.find((g) => g.id === selectedGameId)?.name}
+              </h2>
+
+              {matches.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No matches found for this game</p>
                 </div>
-              </button>
-            ))}
+              ) : (
+                <div className="space-y-4">
+                  {matches.map((match) => (
+                    <MatchCard
+                      key={match.id}
+                      match={match}
+                      onUpdate={() => fetchMatches(selectedGameId)}
+                      socket={socket}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Matches List */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Matches for {assignedGames.find((g) => g.id === selectedGameId)?.name}
-          </h2>
+          {/* Leaderboard - Right/Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow p-6 sticky top-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-yellow-500" />
+                  <h2 className="text-lg font-semibold text-gray-900">Faculty Leaderboard</h2>
+                </div>
+                <button
+                  onClick={() => fetchLeaderboard()}
+                  className="text-gray-400 hover:text-gray-600 transition"
+                  title="Refresh leaderboard"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+              </div>
 
-          {matches.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No matches found for this game</p>
+              {leaderboard && leaderboard.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 text-sm">No scores yet</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {leaderboard && Array.isArray(leaderboard) && leaderboard.map((faculty, index) => (
+                    <div
+                      key={faculty.id}
+                      className={`flex items-center justify-between p-3 rounded-lg ${
+                        index === 0
+                          ? 'bg-yellow-50 border border-yellow-200'
+                          : index === 1
+                          ? 'bg-gray-50 border border-gray-200'
+                          : index === 2
+                          ? 'bg-orange-50 border border-orange-200'
+                          : 'bg-gray-50 border border-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold ${
+                            index === 0
+                              ? 'bg-yellow-500'
+                              : index === 1
+                              ? 'bg-gray-400'
+                              : index === 2
+                              ? 'bg-orange-600'
+                              : 'bg-gray-300'
+                          }`}
+                        >
+                          {index + 1}
+                        </div>
+                        <span className="font-medium text-gray-900 truncate">{faculty.name}</span>
+                      </div>
+                      <span className={`font-bold text-lg ${
+                        index === 0
+                          ? 'text-yellow-600'
+                          : index === 1
+                          ? 'text-gray-600'
+                          : index === 2
+                          ? 'text-orange-600'
+                          : 'text-gray-600'
+                      }`}>
+                        {faculty.totalPoints}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <p className="text-xs text-gray-500 mt-4 text-center">
+                Updates in real-time as scores are saved
+              </p>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {matches.map((match) => (
-                <MatchCard
-                  key={match.id}
-                  match={match}
-                  onUpdate={() => fetchMatches(selectedGameId)}
-                  socket={socket}
-                />
-              ))}
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
@@ -285,7 +408,14 @@ function MatchCard({ match, onUpdate, socket }: MatchCardProps) {
   const handleStatusChange = async (newStatus: 'UPCOMING' | 'LIVE' | 'FINISHED') => {
     try {
       setIsUpdating(true);
-      await api.put(`/matches/${match.id}`, { status: newStatus });
+      
+      // If marking as FINISHED and we have a winner, include it in the same update
+      const updateData: any = { status: newStatus };
+      if (newStatus === 'FINISHED' && match.winnerId) {
+        updateData.winnerId = match.winnerId;
+      }
+      
+      await api.put(`/matches/${match.id}`, updateData);
 
       // Emit Socket.io event
       if (socket) {
@@ -307,7 +437,15 @@ function MatchCard({ match, onUpdate, socket }: MatchCardProps) {
   const handleWinnerChange = async (winnerId: string) => {
     try {
       setIsUpdating(true);
-      await api.put(`/matches/${match.id}`, { winnerId: winnerId || null });
+      
+      // If match is already FINISHED, this will trigger points calculation
+      const updateData: any = { winnerId: winnerId || null };
+      if (match.status === 'FINISHED') {
+        // Ensure status is FINISHED to trigger points calculation
+        updateData.status = 'FINISHED';
+      }
+      
+      await api.put(`/matches/${match.id}`, updateData);
 
       // Emit Socket.io event
       if (socket) {
@@ -458,10 +596,10 @@ function MatchCard({ match, onUpdate, socket }: MatchCardProps) {
             </div>
           )}
 
-          {/* Winner Selection (only for FINISHED matches) */}
-          {match.status === 'FINISHED' && match.participants && match.participants.length > 0 && (
+          {/* Winner Selection (for LIVE and FINISHED matches) */}
+          {(match.status === 'LIVE' || match.status === 'FINISHED') && match.participants && match.participants.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Match Winner</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Match Winner {match.status === 'LIVE' ? '(will finalize when marking as FINISHED)' : ''}</label>
               <select
                 value={match.winnerId || ''}
                 onChange={(e) => handleWinnerChange(e.target.value)}

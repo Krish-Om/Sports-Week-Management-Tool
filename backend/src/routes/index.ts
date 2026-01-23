@@ -7,6 +7,7 @@ import teamRoutes from './team.routes';
 import playerRoutes from './player.routes';
 import matchRoutes from './match.routes';
 import matchParticipantRoutes from './match-participant.routes';
+import pointsRoutes from './points.routes';
 
 const router = Router();
 
@@ -43,5 +44,8 @@ router.use('/matches', matchRoutes);
 
 // Match Participant routes
 router.use('/match-participants', matchParticipantRoutes);
+
+// Points routes
+router.use('/points', pointsRoutes);
 
 export default router;

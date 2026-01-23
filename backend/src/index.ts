@@ -57,10 +57,22 @@ io.on('connection', (socket) => {
     io.emit('matchStatusChange', data);
   });
 
+  // Match winner set event
+  socket.on('matchWinnerSet', (data) => {
+    console.log('🏆 Match winner set:', data);
+    io.emit('matchWinnerSet', data);
+  });
+
   // Leaderboard update event
   socket.on('leaderboardUpdate', (data) => {
-    console.log('🏆 Leaderboard updated:', data);
+    console.log('🏅 Leaderboard updated:', data);
     io.emit('leaderboardUpdate', data);
+  });
+
+  // Points calculation event
+  socket.on('pointsCalculated', (data) => {
+    console.log('📊 Points calculated:', data);
+    io.emit('pointsCalculated', data);
   });
 });
 

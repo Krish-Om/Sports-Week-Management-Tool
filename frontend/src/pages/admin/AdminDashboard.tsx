@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useSocket } from '../../contexts/SocketContext'
-import { Trophy, Users, Calendar, Wifi, WifiOff } from 'lucide-react'
+import { Trophy, Users, Calendar, Wifi, WifiOff, TrendingUp } from 'lucide-react'
 import { api } from '../../config/api'
+
+interface Faculty {
+  id: string
+  name: string
+  totalPoints: number
+}
 
 export const AdminDashboard: React.FC = () => {
   const { user } = useAuth()
-  const { isConnected } = useSocket()
+  const { isConnected, socket } = useSocket()
   const [stats, setStats] = useState({
     faculties: 0,
     teams: 0,
     upcomingMatches: 0,
   })
+  const [leaderboard, setLeaderboard] = useState<Faculty[]>([])
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -42,6 +50,32 @@ export const AdminDashboard: React.FC = () => {
 
     fetchStats()
   }, [])
+
+  // Fetch leaderboard
+  useEffect(() => {
+    fetchLeaderboard()
+  }, [refreshTrigger])
+
+  useEffect(() => {
+    if (!socket) return
+
+    socket.on('leaderboardUpdate', () => {
+      setRefreshTrigger((prev) => prev + 1)
+    })
+
+    return () => {
+      socket.off('leaderboardUpdate')
+    }
+  }, [socket])
+
+  const fetchLeaderboard = async () => {
+    try {
+      const response = await api.get('/points/leaderboard')
+      setLeaderboard(response.data.data || [])
+    } catch (err) {
+      console.error('Failed to fetch leaderboard:', err)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -125,6 +159,46 @@ export const AdminDashboard: React.FC = () => {
             <p className="text-sm text-gray-600 mt-1">Check current faculty standings</p>
           </button>
         </div>
+      </div>
+
+      {/* Faculty Leaderboard */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5" />
+            Faculty Leaderboard
+          </h2>
+          {isConnected && (
+            <span className="text-xs text-green-600 font-medium">Live Updates</span>
+          )}
+        </div>
+        {leaderboard.length === 0 ? (
+          <p className="text-gray-600 text-center py-8">No standings available yet</p>
+        ) : (
+          <div className="space-y-2">
+            {leaderboard.map((faculty, idx) => {
+              const medalEmoji = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '  '
+              const bgColor =
+                idx === 0
+                  ? 'bg-yellow-50'
+                  : idx === 1
+                    ? 'bg-gray-50'
+                    : idx === 2
+                      ? 'bg-orange-50'
+                      : ''
+
+              return (
+                <div key={faculty.id} className={`flex items-center justify-between p-3 rounded-lg ${bgColor}`}>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{medalEmoji}</span>
+                    <span className="font-semibold text-gray-900">{idx + 1}. {faculty.name}</span>
+                  </div>
+                  <span className="text-lg font-bold text-blue-600">{faculty.totalPoints} pts</span>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
   )
