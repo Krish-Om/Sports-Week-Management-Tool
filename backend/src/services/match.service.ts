@@ -7,6 +7,33 @@ export class MatchService {
     return await db.select().from(schema.matches);
   }
 
+  static async getAllWithDetails(): Promise<any[]> {
+    const matches = await this.getAll();
+
+    // Enrich each match with game details and participants
+    const enrichedMatches = await Promise.all(
+      matches.map(async (match) => {
+        // Fetch game details
+        const [gameData] = await db
+          .select()
+          .from(schema.games)
+          .where(eq(schema.games.id, match.gameId))
+          .limit(1);
+
+        // Fetch participants with details
+        const participants = await this.getParticipantsWithDetails(match.id);
+
+        return {
+          ...match,
+          game: gameData || null,
+          participants,
+        };
+      })
+    );
+
+    return enrichedMatches;
+  }
+
   static async getById(id: string): Promise<Match | undefined> {
     const [match] = await db
       .select()
@@ -154,5 +181,26 @@ export class MatchService {
       .limit(1);
     
     return participant;
+  }
+
+  static async getByIdWithDetails(id: string): Promise<any | undefined> {
+    const match = await this.getById(id);
+    if (!match) return undefined;
+
+    // Fetch game details
+    const [gameData] = await db
+      .select()
+      .from(schema.games)
+      .where(eq(schema.games.id, match.gameId))
+      .limit(1);
+
+    // Fetch participants with details
+    const participants = await this.getParticipantsWithDetails(id);
+
+    return {
+      ...match,
+      game: gameData || null,
+      participants,
+    };
   }
 }

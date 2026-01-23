@@ -5,6 +5,8 @@ import { TeamService } from '../services/team.service';
 import { PlayerService } from '../services/player.service';
 import { asyncHandler } from '../middleware/error';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { db, schema } from '../config/database';
+import { eq } from 'drizzle-orm';
 import type { ApiResponse } from '../types/api';
 import type { Match, NewMatch } from '../db/schema';
 
@@ -12,9 +14,9 @@ const router = Router();
 
 // Get all matches (public)
 router.get('/', asyncHandler(async (req: Request, res: Response) => {
-  const matches = await MatchService.getAll();
+  const matches = await MatchService.getAllWithDetails();
   
-  const response: ApiResponse<Match[]> = {
+  const response: ApiResponse<any[]> = {
     success: true,
     data: matches,
   };
@@ -24,20 +26,18 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
 
 // Get match by ID with participants (public)
 router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
-  const match = await MatchService.getById(req.params.id);
+  const matchData = await MatchService.getByIdWithDetails(req.params.id);
   
-  if (!match) {
+  if (!matchData) {
     return res.status(404).json({
       success: false,
       error: 'Match not found',
     });
   }
 
-  const participants = await MatchService.getParticipantsWithDetails(req.params.id);
-  
   const response: ApiResponse<any> = {
     success: true,
-    data: { ...match, participants },
+    data: matchData,
   };
   
   res.json(response);
@@ -100,9 +100,16 @@ router.post('/', authenticateToken, requireAdmin, asyncHandler(async (req: Reque
 
   const matchParticipants = await MatchService.getParticipantsWithDetails(match.id);
   
+  // Fetch game details
+  const [gameData] = await db
+    .select()
+    .from(schema.games)
+    .where(eq(schema.games.id, match.gameId))
+    .limit(1);
+  
   const response: ApiResponse<any> = {
     success: true,
-    data: { ...match, participants: matchParticipants },
+    data: { ...match, game: gameData, participants: matchParticipants },
     message: 'Match created successfully',
   };
   
@@ -205,9 +212,16 @@ router.put('/:id', authenticateToken, asyncHandler(async (req: Request, res: Res
 
   const matchParticipants = await MatchService.getParticipantsWithDetails(match.id);
   
+  // Fetch game details
+  const [gameData] = await db
+    .select()
+    .from(schema.games)
+    .where(eq(schema.games.id, match.gameId))
+    .limit(1);
+  
   const response: ApiResponse<any> = {
     success: true,
-    data: { ...match, participants: matchParticipants },
+    data: { ...match, game: gameData, participants: matchParticipants },
     message: 'Match updated successfully',
   };
   
