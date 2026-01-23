@@ -1,0 +1,59 @@
+erDiagram
+    FACULTY ||--o{ PLAYER : "enrolled in"
+    FACULTY ||--o{ TEAM : "forms"
+    GAME ||--o{ MATCH : "has"
+    MATCH ||--o{ MATCH_PARTICIPANT : "contested by"
+    TEAM ||--o{ MATCH_PARTICIPANT : "competes as"
+    PLAYER ||--o{ MATCH_PARTICIPANT : "competes as"
+    USER ||--o{ GAME : "assigned to manage"
+
+    FACULTY {
+        string id PK
+        string name "CSIT, BCA, BSW, BBS"
+        int totalPoints "Auto-calculated"
+    }
+
+    PLAYER {
+        string id PK
+        string name
+        string facultyId FK
+        string semester "e.g., 5th"
+    }
+
+    GAME {
+        string id PK
+        string name "Futsal, Chess, Cricket, etc."
+        string type "TEAM or INDIVIDUAL"
+        int pointWeight "Weight for Faculty Tally"
+    }
+
+    TEAM {
+        string id PK
+        string facultyId FK
+        string gameId FK
+        string name "e.g., CSIT 5th Tigers"
+    }
+
+    MATCH {
+        string id PK
+        string gameId FK
+        datetime startTime
+        string venue "Ground A, Hall B"
+        string status "UPCOMING, LIVE, FINISHED"
+    }
+
+    MATCH_PARTICIPANT {
+        string id PK
+        string matchId FK
+        string teamId FK "NULL if Individual"
+        string playerId FK "NULL if Team"
+        int score
+        int pointsEarned "Points contributing to Faculty"
+    }
+
+    USER {
+        string id PK
+        string username
+        string passwordHash
+        string role "ADMIN or MANAGER"
+    }
