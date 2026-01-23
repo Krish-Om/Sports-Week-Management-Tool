@@ -74,26 +74,52 @@
 - [x] Create Admin dashboard with stats cards
 - [x] Build Public dashboard homepage
 
-### 🔐 Phase 4: User Management & API Integration (Day 2 - 3 hours)
+### ✅ Phase 4: User Management & API Integration (COMPLETED)
 - [x] Create JWT-based login API endpoint
 - [x] Implement password hashing (bcrypt)
 - [x] Build simple login page with username/password
 - [x] Create protected route HOC/wrapper
 - [x] Setup role-based access control (ADMIN, MANAGER)
 - [x] Seed script: Create initial admin + sample managers
-- [ ] Admin dashboard: User management CRUD (create/edit/delete managers)
-- [ ] Connect frontend to backend API endpoints
-- [ ] Test authentication flow end-to-end
+- [x] Admin dashboard: User management CRUD (create/edit/delete managers)
+- [x] Connect frontend to backend API endpoints
+- [x] Test authentication flow end-to-end
+- [x] Fix Tailwind CSS v4 configuration issues
+- [x] Fix import path issues in frontend components
 
-### 👨‍💼 Phase 5: Admin Dashboard (Day 2 - 8 hours)
-- [ ] Create admin layout with navigation
+### 👨‍💼 Phase 5: Admin Dashboard CRUD Operations (Day 3 - 8 hours)
+- [x] Create admin layout with navigation (completed in Phase 3)
 - [ ] Build CRUD operations for Faculties
+  - [ ] Create FacultyService backend methods (already exists, need to verify)
+  - [ ] Build faculty API routes (already exists, need to verify)
+  - [ ] Create FacultiesPage component with table and modal
+  - [ ] Test faculty CRUD operations
 - [ ] Build CRUD operations for Games
+  - [ ] Create GameService backend methods
+  - [ ] Build game API routes
+  - [ ] Create GamesPage component with form
+  - [ ] Add game type selection (TEAM/INDIVIDUAL)
+  - [ ] Add manager assignment dropdown
+  - [ ] Test game CRUD operations
 - [ ] Build CRUD operations for Teams
+  - [ ] Create TeamService backend methods
+  - [ ] Build team API routes
+  - [ ] Create TeamsPage component
+  - [ ] Add faculty and game relationship selectors
+  - [ ] Test team CRUD operations
 - [ ] Build CRUD operations for Players
-- [ ] Build CRUD operations for Users (organizers)
+  - [ ] Create PlayerService backend methods
+  - [ ] Build player API routes
+  - [ ] Create PlayersPage component
+  - [ ] Add faculty assignment and semester fields
+  - [ ] Test player CRUD operations
 - [ ] Build CRUD operations for Matches
-- [ ] Connect all forms to Express API endpoints
+  - [ ] Create MatchService backend methods
+  - [ ] Build match API routes
+  - [ ] Create MatchesPage component
+  - [ ] Add participant assignment (teams or players)
+  - [ ] Add venue, start time, and status fields
+  - [ ] Test match CRUD operations
 
 ### 🎮 Phase 6: Manager Dashboard (Day 3 - 6 hours)
 - [ ] Create manager-specific layout
