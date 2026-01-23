@@ -5,6 +5,7 @@ import { useToast } from '../../contexts/ToastContext'
 import { Trophy, Users, Calendar, Wifi, WifiOff, TrendingUp } from 'lucide-react'
 import { api } from '../../config/api'
 import { StatsSkeleton, LeaderboardSkeleton } from '../../components/Skeleton'
+import { AnimatedCard, AnimatedList, AnimatedListItem, PageTransition } from '../../components/animations'
 
 interface Faculty {
   id: string
@@ -89,26 +90,27 @@ export const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Welcome back, {user?.username}!</p>
+    <PageTransition>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600 mt-1">Welcome back, {user?.username}!</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            {isConnected ? (
+              <div className="flex items-center space-x-2 text-green-600">
+                <Wifi className="w-5 h-5" />
+                <span className="text-sm font-medium">Connected</span>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2 text-red-600">
+                <WifiOff className="w-5 h-5" />
+                <span className="text-sm font-medium">Disconnected</span>
+              </div>
+            )}
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          {isConnected ? (
-            <div className="flex items-center space-x-2 text-green-600">
-              <Wifi className="w-5 h-5" />
-              <span className="text-sm font-medium">Connected</span>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-2 text-red-600">
-              <WifiOff className="w-5 h-5" />
-              <span className="text-sm font-medium">Disconnected</span>
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Stats Cards */}
       <div className="grid md:grid-cols-3 gap-6">
@@ -120,7 +122,7 @@ export const AdminDashboard: React.FC = () => {
           </>
         ) : (
           <>
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <AnimatedCard variant="slideInLeft" className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-600 text-sm font-medium">Total Faculties</p>
@@ -130,9 +132,9 @@ export const AdminDashboard: React.FC = () => {
                   <Trophy className="w-8 h-8 text-primary" />
                 </div>
               </div>
-            </div>
+            </AnimatedCard>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <AnimatedCard variant="slideInBottom" className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-600 text-sm font-medium">Total Teams</p>
@@ -142,9 +144,9 @@ export const AdminDashboard: React.FC = () => {
                   <Users className="w-8 h-8 text-secondary" />
                 </div>
               </div>
-            </div>
+            </AnimatedCard>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <AnimatedCard variant="slideInRight" className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-600 text-sm font-medium">Upcoming Matches</p>
@@ -154,7 +156,7 @@ export const AdminDashboard: React.FC = () => {
                   <Calendar className="w-8 h-8 text-green-600" />
                 </div>
               </div>
-            </div>
+            </AnimatedCard>
           </>
         )}
       </div>
@@ -223,6 +225,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
         )}
       </div>
+      </PageTransition>
     </div>
   )
 }
