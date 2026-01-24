@@ -25,11 +25,11 @@ services:
     container_name: sports-week-api
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://${DB_USER:-sports}:${DB_PASSWORD:-sports123}@postgres:5432/${DB_NAME:-sports_week}
-      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://${DB_USER:-sports}:${DB_PASSWORD:-sports123}@postgres:5432/${DB_NAME:-sports}
+      JWT_SECRET: ${JWT_SECRET:-e5a3852f173eaf3da76594e43046016abba53236913ec77c7da73904a8411078}
       PORT: 3001
       NODE_ENV: production
-      FRONTEND_URL: https://${DOMAIN}
+      FRONTEND_URL: https://project-sports.krishombasukala.com.np
     depends_on:
       postgres:
         condition: service_healthy
@@ -48,8 +48,8 @@ services:
     container_name: sports-week-web
     restart: unless-stopped
     environment:
-      VITE_API_URL: https://${DOMAIN}/api
-      VITE_SOCKET_URL: https://${DOMAIN}
+      VITE_API_URL: https://project-sports.krishombasukala.com.np/api
+      VITE_SOCKET_URL: https://project-sports.krishombasukala.com.np
     depends_on:
       - backend
     networks:
