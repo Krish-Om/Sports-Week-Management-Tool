@@ -5,9 +5,9 @@ services:
     container_name: sports-week-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-sports_week}
+      POSTGRES_DB: ${DB_NAME:-sports}
       POSTGRES_USER: ${DB_USER:-sports}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-sports123}
+      POSTGRES_PASSWORD: sports123
       POSTGRES_HOST_AUTH_METHOD: "md5"
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -25,7 +25,7 @@ services:
     container_name: sports-week-api
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://${DB_USER:-sports}:${DB_PASSWORD:-sports123}@postgres:5432/${DB_NAME:-sports}
+      DATABASE_URL: postgresql://sports:sports123@postgres:5432/sports
       JWT_SECRET: ${JWT_SECRET:-e5a3852f173eaf3da76594e43046016abba53236913ec77c7da73904a8411078}
       PORT: 3001
       NODE_ENV: production
