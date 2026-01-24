@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 # Step 1: Check Prerequisites
 echo -e "\n${BLUE}Step 1: Checking Prerequisites...${NC}"
 command -v docker &> /dev/null || { echo "Docker not found. Install Docker first."; exit 1; }
-command -v docker-compose &> /dev/null || { echo "Docker Compose not found. Install it first."; exit 1; }
+command -v docker compose &> /dev/null || { echo "Docker Compose not found. Install it first."; exit 1; }
 echo -e "${GREEN}✓ Docker and Docker Compose installed${NC}"
 
 # Step 2: Prepare environment
