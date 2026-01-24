@@ -1,6 +1,18 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+// Construct API base URL that works both locally and in production
+const API_BASE_URL = (() => {
+  const envUrl = import.meta.env.VITE_API_URL
+  
+  // If local dev environment, use the env URL directly
+  if (envUrl && (envUrl.includes('localhost') || envUrl.includes('127.0.0.1'))) {
+    return envUrl
+  }
+  
+  // For production/tunnel, use current origin (same domain as frontend)
+  // This ensures API calls go through Nginx proxy like everything else
+  return window.location.origin
+})()
 
 export const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,

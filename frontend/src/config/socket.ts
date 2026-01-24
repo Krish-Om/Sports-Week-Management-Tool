@@ -1,6 +1,19 @@
 import { io, Socket } from 'socket.io-client'
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+// Construct Socket.io URL that works both locally and in production
+const SOCKET_URL = (() => {
+  const envUrl = import.meta.env.VITE_API_URL
+  
+  // If local dev environment, use the env URL directly
+  if (envUrl && (envUrl.includes('localhost') || envUrl.includes('127.0.0.1'))) {
+    return envUrl
+  }
+  
+  // For production/tunnel, use current origin (same domain as frontend)
+  // This ensures WebSocket goes through Nginx proxy like everything else
+  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+  return `${protocol}://${window.location.host}`
+})()
 
 class SocketManager {
   private socket: Socket | null = null
