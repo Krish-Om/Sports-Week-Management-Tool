@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: sports-week-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-sports_week}
+      POSTGRES_USER: ${DB_USER:-sports}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sports123}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sports-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-sports}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    image: ghcr.io/krish-om/sports-week-backend:latest
+    container_name: sports-week-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-sports}:${DB_PASSWORD:-sports123}@postgres:5432/${DB_NAME:-sports_week}
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 3001
+      NODE_ENV: production
+      FRONTEND_URL: https://${DOMAIN}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - sports-network
+    healthcheck:
+      test: [ "CMD-SHELL", "bun -e \"fetch('http://localhost:3001/api/health').then(() => process.exit(0)).catch(() => process.exit(1))\"" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Frontend Web App
+  frontend:
+    image: ghcr.io/krish-om/sports-week-frontend:latest
+    container_name: sports-week-web
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: https://${DOMAIN}/api
+      VITE_SOCKET_URL: https://${DOMAIN}
+    depends_on:
+      - backend
+    networks:
+      - sports-network
+    healthcheck:
+      test: [ "CMD-SHELL", "bun -e \"fetch('http://localhost:5173').then(() => process.exit(0)).catch(() => process.exit(1))\"" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: sports-week-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - sports-network
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  sports-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
