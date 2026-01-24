@@ -51,7 +51,7 @@ credentials-file: /home/USER/.cloudflared/sports-week-tunnel.json
 
 ingress:
   - hostname: project-sports.krishombasukala.com.np
-    service: https://localhost
+    service: https://localhost:8443
     originRequest:
       originServerName: project-sports.krishombasukala.com.np
       noTLSVerify: false
@@ -161,9 +161,13 @@ docker compose -f docker-compose.homeserver.yml ps
 # View logs
 docker compose -f docker-compose.homeserver.yml logs -f
 
-# Test endpoints
+# Test internal endpoints
 curl http://localhost:3001/api/health
 curl http://localhost:5173
+
+# Test through nginx (on 8080 for internal testing)
+curl http://localhost:8080 -k
+curl http://localhost:8080/api/health -k
 ```
 
 ## Step 7: Run Cloudflared Tunnel
@@ -366,10 +370,13 @@ Internet (CloudFlare)
     ↓
 Cloudflared Tunnel (No open ports!)
     ↓
-Nginx Reverse Proxy (443 SSL)
+Nginx Reverse Proxy (8443 SSL)
     ├─→ Frontend (5173, Bun)
     ├─→ Backend (3001, Express + Bun)
     └─→ PostgreSQL (5432, Alpine)
+
+Note: Ports 8080/8443 are internal only
+      CasaOS gateway keeps port 80
 ```
 
 ## Security Best Practices
