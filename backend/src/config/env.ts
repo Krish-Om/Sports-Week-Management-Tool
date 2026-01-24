@@ -1,6 +1,9 @@
 import dotenv from 'dotenv';
 
-dotenv.config();
+// Only load .env in development mode
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 interface EnvConfig {
   DATABASE_URL: string;

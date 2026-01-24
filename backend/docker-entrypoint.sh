@@ -2,6 +2,7 @@
 
 echo "🔄 Running database migrations..."
 echo "DATABASE_URL: $DATABASE_URL"
+echo "FRONTEND_URL: $FRONTEND_URL"
 
 # Ensure DATABASE_URL environment variable is set
 if [ -z "$DATABASE_URL" ]; then
@@ -19,4 +20,5 @@ else
 fi
 
 echo "🚀 Starting backend server..."
-exec bun start
+# Pass NODE_ENV to prevent dotenv from loading .env
+NODE_ENV=production exec bun index.ts
