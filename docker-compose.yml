@@ -28,7 +28,7 @@ services:
     environment:
       #postgresql://username:password@localhost/mydatabase
       DATABASE_URL: postgresql://sports_user:sports123@postgres:5432/sports_week
-      JWT_SECRET: samriddhi-sports-week-2026-super-secret-key-change-in-production
+      JWT_SECRET: sports-week-2026-super-secret-key-change-in-production
       PORT: 3001
       NODE_ENV: production
       FRONTEND_URL: http://localhost:5173

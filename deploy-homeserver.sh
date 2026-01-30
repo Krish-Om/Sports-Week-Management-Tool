@@ -44,7 +44,7 @@ echo -e "\n${BLUE}Step 3: Creating SSL certificates...${NC}"
 mkdir -p ssl
 if [ ! -f ssl/cert.pem ]; then
     openssl req -x509 -newkey rsa:4096 -keyout ssl/key.pem -out ssl/cert.pem -days 365 -nodes \
-        -subj "/C=NP/ST=Kathmandu/L=Kathmandu/O=SportWeek/CN=project-sports.krishombasukala.com.np"
+        -subj "/C=NP/ST=Kathmandu/L=Kathmandu/O=SportWeek/CN=projectsports.krishombasukala.com.np"
     echo -e "${GREEN}✓ Self-signed certificates created${NC}"
 else
     echo -e "${GREEN}✓ SSL certificates already exist${NC}"
@@ -90,7 +90,7 @@ echo ""
 echo "4. Get tunnel ID and save credentials"
 echo ""
 echo "5. Setup DNS in Cloudflare Dashboard:"
-echo "   CNAME: project-sports → <tunnel-id>.cfargotunnel.com"
+echo "   CNAME: projectsports → <tunnel-id>.cfargotunnel.com"
 echo ""
 echo "6. Run tunnel:"
 echo "   cloudflared tunnel run sports-week-tunnel"

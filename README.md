@@ -1,8 +1,7 @@
-# 🏆 Samriddhi College Sports Week Management Tool
+# 🏆College Sports Week Management Tool
 
-**College:** Samriddhi College, Nepal  
 **Event:** 3-Day Sports Week  
-**Organizer:** 5th Semester CSIT Students  
+**Organizer:** CSIT Students
 **Faculties:** CSIT, BCA, BSW, BBS  
 
 ---

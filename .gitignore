@@ -77,3 +77,5 @@ docker-compose.override.yml
 
 # Vercel
 .vercel
+
+assests/*.md

@@ -5,8 +5,8 @@ services:
     container_name: sports-week-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-sports}
-      POSTGRES_USER: ${DB_USER:-sports}
+      POSTGRES_DB: ${DB_NAME:sports}
+      POSTGRES_USER: ${DB_USER:sports}
       POSTGRES_PASSWORD: sports123
       POSTGRES_HOST_AUTH_METHOD: "md5"
     volumes:
@@ -14,7 +14,7 @@ services:
     networks:
       - sports-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-sports}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:sports}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,7 +29,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:-e5a3852f173eaf3da76594e43046016abba53236913ec77c7da73904a8411078}
       PORT: 3001
       NODE_ENV: production
-      FRONTEND_URL: https://project-sports.krishombasukala.com.np
+      FRONTEND_URL: https://projectsports.krishombasukala.com.np
     depends_on:
       postgres:
         condition: service_healthy
@@ -48,8 +48,8 @@ services:
     container_name: sports-week-web
     restart: unless-stopped
     environment:
-      VITE_API_URL: https://project-sports.krishombasukala.com.np/api
-      VITE_SOCKET_URL: https://project-sports.krishombasukala.com.np
+      VITE_API_URL: https://projectsports.krishombasukala.com.np/api
+      VITE_SOCKET_URL: https://projectsports.krishombasukala.com.np
     depends_on:
       - backend
     networks:

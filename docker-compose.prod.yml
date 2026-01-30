@@ -7,9 +7,9 @@ services:
     container_name: sports-week-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-sports_week}
-      POSTGRES_USER: ${DB_USER:-sports}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-sports123}
+      POSTGRES_DB: ${DB_NAME:sports_week}
+      POSTGRES_USER: ${DB_USER:sports}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:sports123}
       POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:
       - "${DB_PORT:-5433}:5432"
@@ -18,7 +18,7 @@ services:
     networks:
       - sports-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-sports}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:sports}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,8 +31,8 @@ services:
     container_name: sports-week-api
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://${DB_USER:-sports}:${DB_PASSWORD:-sports123}@postgres:5432/${DB_NAME:-sports_week}
-      JWT_SECRET: ${JWT_SECRET:-samriddhi-sports-week-2026-super-secret-key-change-in-production}
+      DATABASE_URL: postgresql://${DB_USER:sports}:${DB_PASSWORD:sports123}@postgres:5432/${DB_NAME:sports_week}
+      JWT_SECRET: ${JWT_SECRET:- sports-week-2026-super-secret-key-change-in-production}
       PORT: 3001
       NODE_ENV: ${NODE_ENV:-production}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
