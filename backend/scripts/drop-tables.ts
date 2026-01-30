@@ -10,7 +10,7 @@ async function dropAllTables() {
     await sql.unsafe(`
       DROP SCHEMA public CASCADE;
       CREATE SCHEMA public;
-      GRANT ALL ON SCHEMA public TO sports;
+      GRANT ALL ON SCHEMA public TO sports_week;
       GRANT ALL ON SCHEMA public TO public;
     `);
     

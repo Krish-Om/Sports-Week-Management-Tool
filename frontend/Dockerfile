@@ -3,6 +3,14 @@ FROM oven/bun:latest AS builder
 
 WORKDIR /app
 
+# Accept build arguments
+ARG VITE_API_URL
+ARG VITE_SOCKET_URL
+
+# Set environment variables for build
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_SOCKET_URL=$VITE_SOCKET_URL
+
 # Copy package files
 COPY package.json bun.lock* ./
 

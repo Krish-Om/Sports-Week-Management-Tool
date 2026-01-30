@@ -14,7 +14,7 @@ COPY . .
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 
 # Make entrypoint executable
-RUN chmod +x /app/docker-entrypoint.sh
+RUN chmod u+x /app/docker-entrypoint.sh
 
 # Expose port
 EXPOSE 3001
