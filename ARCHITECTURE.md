@@ -33,7 +33,7 @@ graph TB
             Nginx --> Frontend
             Nginx --> Backend
             Backend --> Postgres
-            Frontend -.Socket.io.-> Backend
+            Frontend -- Socket.io --> Backend
         end
     end
     
