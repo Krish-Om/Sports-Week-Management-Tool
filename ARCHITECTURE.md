@@ -288,9 +288,9 @@ graph LR
         P3 --> P4[View Leaderboard]
     end
     
-    A5 -.Socket.io Broadcast.-> M4
-    A5 -.Socket.io Broadcast.-> P3
-    M3 -.Socket.io Broadcast.-> P3
+    A5 -- Socket.io Broadcast --> M4
+    A5 -- Socket.io Broadcast --> P3
+    M3 -- Socket.io Broadcast--> P3
     
     style AdminFlow fill:#ffccbc
     style ManagerFlow fill:#bbdefb
