@@ -9,14 +9,16 @@
 ## 📚 Table of Contents
 - [Project Overview](#project-overview)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
+- [Deployment Architecture](#deployment-architecture)
 - [Design System & UX/UI](#design-system--uxui)
 - [Animation System](#animation-system)
 - [Backend & API](#backend--api)
 - [Frontend & Testing](#frontend--testing)
 - [Docker & Deployment](#docker--deployment)
+- [Tailscale Deployment (Recommended)](#tailscale-deployment-recommended)
 - [Cloudflare Tunnel Guide](#cloudflare-tunnel-guide)
 - [Homeserver Deployment](#homeserver-deployment)
-- [Refactoring & Architecture](#refactoring--architecture)
+- [Code Architecture & Refactoring](#code-architecture--refactoring)
 - [Testing & Reports](#testing--reports)
 - [Project Phases & TODOs](#project-phases--todos)
 - [Support & Resources](#support--resources)
@@ -34,7 +36,22 @@ This tool manages a multi-faculty sports week event, providing real-time dashboa
 - **Database:** PostgreSQL 16 (Docker)
 - **Real-time:** Socket.io 4.8.3
 - **Auth:** JWT (Admin/Manager roles)
-- **Deployment:** Docker Compose, Cloudflare Tunnel, Homeserver
+- **Deployment:** Docker Compose + Tailscale VPN (recommended)
+- **Reverse Proxy:** Nginx
+- **Container Registry:** GitHub Container Registry (GHCR)
+
+**Deployment Scripts:**
+- `deploy-tailscale.sh` - One-command Tailscale deployment
+- `build-and-push.sh` - Build and push Docker images to GHCR
+- `deploy-homeserver.sh` - Legacy homeserver deployment
+
+**Quick Links:**
+- 📐 [Architecture Diagrams](ARCHITECTURE.md) - Mermaid diagrams of deployment architecture
+- 🚀 [Tailscale Guide](TAILSCALE_DEPLOYMENT.md) - Recommended deployment method
+- 📋 [Quick Start](QUICK_START_TAILSCALE.md) - 5-minute deployment guide
+- 📊 [Deployment Comparison](DEPLOYMENT_COMPARISON.md) - Tailscale vs Cloudflare
+- ✅ [Deployment Checklist](DEPLOYMENT_CHECKLIST.md) - Step-by-step verification
+- 📝 [Deployment Story](linkedin_post.txt) - How this was built and deployed
 
 ---
 
@@ -101,6 +118,30 @@ erDiagram
         string role "ADMIN or MANAGER"
     }
 ```
+
+---
+
+## Deployment Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for comprehensive deployment architecture diagrams.
+
+**Interactive Mermaid Diagrams:**
+- System Architecture: Complete overview of Tailscale → Docker stack
+- Request Flow: Sequence diagram showing user interactions
+- Network Topology: Docker network and external access patterns
+- Deployment Process: Complete deployment flowchart
+- Security Layers: 4-layer security architecture
+- Scaling Options: Future growth paths
+- Traffic Patterns: User workflow diagrams
+- Monitoring Points: Observable metrics
+- Backup Strategy: Automated backup schedule
+
+**Key Architecture Highlights:**
+- **Tailscale VPN**: WireGuard mesh network for secure access
+- **Docker Compose**: 4-container orchestration (nginx, backend, frontend, postgres)
+- **Nginx Reverse Proxy**: Routes traffic and handles WebSocket upgrades
+- **Zero-Cost Hosting**: Self-hosted on home server (Dell laptop)
+- **Real-time Updates**: Socket.io for live score broadcasting
 
 ---
 
@@ -182,15 +223,14 @@ bun test
 
 ## Docker & Deployment
 
-See [TAILSCALE_DEPLOYMENT.md](TAILSCALE_DEPLOYMENT.md) (recommended for home servers), [DEPLOYMENT_COMPARISON.md](DEPLOYMENT_COMPARISON.md), and [HOMESERVER_DEPLOYMENT.md](HOMESERVER_DEPLOYMENT.md).
-
-**Quick Start (Tailscale - Recommended):**
-```bash
-# One command deployment with Tailscale
-./deploy-tailscale.sh
-
-# Access at: http://<your-device>.tail-scale.ts.net
-```
+**Complete Deployment Guides:**
+- [TAILSCALE_DEPLOYMENT.md](TAILSCALE_DEPLOYMENT.md) - **Recommended** for home servers
+- [DEPLOYMENT_COMPARISON.md](DEPLOYMENT_COMPARISON.md) - Compare Tailscale vs Cloudflare
+- [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) - Step-by-step verification
+- [DEPLOYMENT_SUMMARY.md](DEPLOYMENT_SUMMARY.md) - Quick overview
+- [QUICK_START_TAILSCALE.md](QUICK_START_TAILSCALE.md) - 5-minute guide
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Architecture diagrams
+- [HOMESERVER_DEPLOYMENT.md](HOMESERVER_DEPLOYMENT.md) - Full homeserver guide
 
 **Local Development:**
 ```bash
@@ -203,7 +243,50 @@ docker compose logs -f
 - Web App: http://localhost:5173
 - API: http://localhost:3001
 - Database: localhost:5433
-- Tailscale URL: http://<hostname>.tail-scale.ts.net (after deployment)
+
+---
+
+## Tailscale Deployment (Recommended)
+
+**Why Tailscale?**
+- ✅ $0 hosting cost
+- ✅ WireGuard encryption (bank-grade security)
+- ✅ 5-minute setup
+- ✅ No credit card required
+- ✅ No port forwarding needed
+- ✅ Works behind NAT
+- ✅ 100% uptime on private network
+
+**One-Command Deployment:**
+```bash
+./deploy-tailscale.sh
+```
+
+**What it does:**
+1. Checks prerequisites (Docker, Tailscale)
+2. Gets your Tailscale hostname automatically
+3. Generates secure passwords and JWT secret
+4. Creates .env with proper configuration
+5. Pulls Docker images from GHCR
+6. Starts all services with health checks
+7. Provides your access URL
+
+**Access URL:**
+```
+http://<your-device>.tail-scale.ts.net
+```
+
+**Build and Push Images:**
+```bash
+./build-and-push.sh
+```
+
+**User Access:**
+1. Install Tailscale
+2. Join your Tailscale network (via invite link)
+3. Access the URL
+
+**See [TAILSCALE_DEPLOYMENT.md](TAILSCALE_DEPLOYMENT.md) for complete guide.**
 
 ---
 
@@ -231,7 +314,7 @@ See [HOMESERVER_DEPLOYMENT.md](HOMESERVER_DEPLOYMENT.md) for full guide.
 
 ---
 
-## Refactoring & Architecture
+## Code Architecture & Refactoring
 
 See [REFACTORING_SUMMARY.md](REFACTORING_SUMMARY.md) and [backend/README.md](backend/README.md).
 
@@ -297,7 +380,18 @@ See [AI_CONTEXT.prompt.txt](AI_CONTEXT.prompt.txt) for full breakdown.
 
 ---
 
-**Status:** ✅ Production Ready  
-**Deployment:** ✅ Tailscale self-hosting available (5-minute setup)  
-**Note:** Cloudflare Tunnel has free tier limitations for asset access. **Tailscale is now the recommended deployment method** for home servers - see [TAILSCALE_DEPLOYMENT.md](TAILSCALE_DEPLOYMENT.md) and [DEPLOYMENT_COMPARISON.md](DEPLOYMENT_COMPARISON.md) for details.  
+**Status:** ✅ Production Ready | 🚀 Self-Hosted on Tailscale  
+**Deployment:** ✅ One-command setup (`./deploy-tailscale.sh`) - 5 minutes from zero to deployed  
+**Cost:** $0 - Self-hosted on home server (Dell laptop) with Tailscale VPN  
+**Access:** Secure mesh network via Tailscale - invite-only access for managers  
+**Features:** Real-time scoring, live leaderboards, team management, automated points calculation  
+
+**Recommended Deployment:** Tailscale (see [TAILSCALE_DEPLOYMENT.md](TAILSCALE_DEPLOYMENT.md))  
+**Alternative:** Cloudflare Tunnel has free tier limitations - see [DEPLOYMENT_COMPARISON.md](DEPLOYMENT_COMPARISON.md)
+
+**Documentation:**
+- Complete architecture diagrams in [ARCHITECTURE.md](ARCHITECTURE.md)
+- Deployment guides: Tailscale, Cloudflare, Homeserver
+- Production deployment story: [linkedin_post.txt](linkedin_post.txt)
+
 **Last Updated:** February 9, 2026
