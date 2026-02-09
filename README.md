@@ -182,9 +182,17 @@ bun test
 
 ## Docker & Deployment
 
-See [DOCKER_QUICK_REF.md](DOCKER_QUICK_REF.md), [DOCKER_BUILD_STATUS.md](DOCKER_BUILD_STATUS.md), [PHASE_10_SUMMARY.md](PHASE_10_SUMMARY.md), and [HOMESERVER_DEPLOYMENT.md](HOMESERVER_DEPLOYMENT.md).
+See [TAILSCALE_DEPLOYMENT.md](TAILSCALE_DEPLOYMENT.md) (recommended for home servers), [DEPLOYMENT_COMPARISON.md](DEPLOYMENT_COMPARISON.md), and [HOMESERVER_DEPLOYMENT.md](HOMESERVER_DEPLOYMENT.md).
 
-**Quick Start:**
+**Quick Start (Tailscale - Recommended):**
+```bash
+# One command deployment with Tailscale
+./deploy-tailscale.sh
+
+# Access at: http://<your-device>.tail-scale.ts.net
+```
+
+**Local Development:**
 ```bash
 docker compose up -d
 docker compose ps
@@ -195,6 +203,7 @@ docker compose logs -f
 - Web App: http://localhost:5173
 - API: http://localhost:3001
 - Database: localhost:5433
+- Tailscale URL: http://<hostname>.tail-scale.ts.net (after deployment)
 
 ---
 
@@ -288,6 +297,7 @@ See [AI_CONTEXT.prompt.txt](AI_CONTEXT.prompt.txt) for full breakdown.
 
 ---
 
-**Status:** ✅ Production Ready
-**PS Note:** Due to the unavalability of free tier tunneling, this project has failed to be exposed to the real-world. We tried with cloudflare's tunneling and tailscale tunneling, both had some limitations regarding the access control of assests.
-**Last Updated:** January 23, 2026
+**Status:** ✅ Production Ready  
+**Deployment:** ✅ Tailscale self-hosting available (5-minute setup)  
+**Note:** Cloudflare Tunnel has free tier limitations for asset access. **Tailscale is now the recommended deployment method** for home servers - see [TAILSCALE_DEPLOYMENT.md](TAILSCALE_DEPLOYMENT.md) and [DEPLOYMENT_COMPARISON.md](DEPLOYMENT_COMPARISON.md) for details.  
+**Last Updated:** February 9, 2026
