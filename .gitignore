@@ -80,4 +80,7 @@ docker-compose.override.yml
 
 assests/*.md
 
+SECURITY_AUDIT.md
+SECURITY_CHECKLIST.md
+SECURITY_FIX_SUMMARY.md
 .env.homeserver

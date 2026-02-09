@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:-sports_week}
       POSTGRES_USER: ${DB_USER:-sports_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-sports123}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Error: DB_PASSWORD not set. Run deploy-tailscale.sh or create .env file}
       POSTGRES_HOST_AUTH_METHOD: "md5"
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -25,8 +25,8 @@ services:
     container_name: sports-week-api
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://${DB_USER:-sports_user}:${DB_PASSWORD:-sports123}@postgres:5432/${DB_NAME:-sports_week}
-      JWT_SECRET: ${JWT_SECRET:-e5a3852f173eaf3da76594e43046016abba53236913ec77c7da73904a8411078}
+      DATABASE_URL: postgresql://${DB_USER:-sports_user}:${DB_PASSWORD:?Error: DB_PASSWORD not set}@postgres:5432/${DB_NAME:-sports_week}
+      JWT_SECRET: ${JWT_SECRET:?Error: JWT_SECRET not set. Run deploy-tailscale.sh or create .env file}
       PORT: 3001
       NODE_ENV: production
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
