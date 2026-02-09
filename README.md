@@ -255,7 +255,20 @@ docker compose logs -f
 - ✅ No credit card required
 - ✅ No port forwarding needed
 - ✅ Works behind NAT
-- ✅ 100% uptime on private network
+- ✅ **Both private AND public access options**
+
+**Access Methods:**
+
+1. **Private Network (Primary)** - 100% reliable, invite-only
+   - Users join your Tailscale network
+   - Access via: `http://<device>.tail-scale.ts.net`
+   - Perfect for managers and authorized users
+
+2. **Public Access (Tailscale Funnel)** - Works for most users
+   - Enabled with: `tailscale funnel 80`
+   - Access via: `https://<device>.saury-company.ts.net`
+   - No Tailscale required for viewers
+   - Note: May have DNS restrictions on some mobile networks
 
 **One-Command Deployment:**
 ```bash
@@ -269,11 +282,11 @@ docker compose logs -f
 4. Creates .env with proper configuration
 5. Pulls Docker images from GHCR
 6. Starts all services with health checks
-7. Provides your access URL
+7. Provides your access URLs (private + public)
 
-**Access URL:**
-```
-http://<your-device>.tail-scale.ts.net
+**Enable Public Access (Optional):**
+```bash
+tailscale funnel 80
 ```
 
 **Build and Push Images:**
@@ -282,9 +295,15 @@ http://<your-device>.tail-scale.ts.net
 ```
 
 **User Access:**
+
+*For Managers (Private Network):*
 1. Install Tailscale
 2. Join your Tailscale network (via invite link)
-3. Access the URL
+3. Access the private URL
+
+*For Public Viewers (Funnel):*
+1. Just visit the public URL - no Tailscale needed!
+2. Works on most networks
 
 **See [TAILSCALE_DEPLOYMENT.md](TAILSCALE_DEPLOYMENT.md) for complete guide.**
 
@@ -380,10 +399,12 @@ See [AI_CONTEXT.prompt.txt](AI_CONTEXT.prompt.txt) for full breakdown.
 
 ---
 
-**Status:** ✅ Production Ready | 🚀 Self-Hosted on Tailscale  
+**Status:** ✅ Production Ready | 🚀 Self-Hosted on Tailscale | 🌐 Publicly Accessible  
 **Deployment:** ✅ One-command setup (`./deploy-tailscale.sh`) - 5 minutes from zero to deployed  
 **Cost:** $0 - Self-hosted on home server (Dell laptop) with Tailscale VPN  
-**Access:** Secure mesh network via Tailscale - invite-only access for managers  
+**Access:**  
+- 🔒 **Private Network:** Secure invite-only access for managers via Tailscale mesh  
+- 🌍 **Public Access:** Available via Tailscale Funnel (no Tailscale required for viewers)  
 **Features:** Real-time scoring, live leaderboards, team management, automated points calculation  
 
 **Recommended Deployment:** Tailscale (see [TAILSCALE_DEPLOYMENT.md](TAILSCALE_DEPLOYMENT.md))  
@@ -393,5 +414,7 @@ See [AI_CONTEXT.prompt.txt](AI_CONTEXT.prompt.txt) for full breakdown.
 - Complete architecture diagrams in [ARCHITECTURE.md](ARCHITECTURE.md)
 - Deployment guides: Tailscale, Cloudflare, Homeserver
 - Production deployment story: [linkedin_post.txt](linkedin_post.txt)
+
+**PS** : This sevice may be unavailable after the event ends.
 
 **Last Updated:** February 9, 2026
